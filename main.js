@@ -9,9 +9,6 @@
   const startBtn = document.getElementById("start");
   const rotateEl = document.getElementById("rotate");
   const touchControlsEl = document.getElementById("touch-controls");
-  const dpadEl = document.getElementById("dpad");
-  const skiPadEl = document.getElementById("ski-pad");
-  const actionBtn = document.getElementById("action");
 
   const LOGICAL_W = 360;
   const LOGICAL_H = 640;
@@ -49,7 +46,10 @@
     y: LOGICAL_H - 50,
     w: 18,
     h: 22,
-    speed: 150,
+    speed: 0,
+    maxSpeed: 180,
+    acceleration: 300,
+    deceleration: 250,
   };
 
   let vehicles = [];
@@ -139,6 +139,7 @@
   function resetHoraceToRoad() {
     horace.x = LOGICAL_W / 2;
     horace.y = LOGICAL_H - 40;
+    horace.speed = 0;
     shopTimer = 0;
     shopScored = false;
     state.crossingStart = performance.now();
@@ -197,6 +198,7 @@
 
     horace.x = LOGICAL_W / 2;
     horace.y = 40;
+    horace.speed = 0;
     cameraY = 0;
   }
 
@@ -234,11 +236,21 @@
       }
     });
 
-    const dx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-    const dy = (input.down ? 1 : 0) - (input.up ? 1 : 0);
-    if (dx !== 0 || dy !== 0) {
-      horace.x += dx * horace.speed * dt;
-      horace.y += dy * horace.speed * dt;
+    // Forward/back controls only with acceleration
+    const isMoving = input.up || input.down;
+
+    if (input.up) {
+      horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
+    } else if (input.down) {
+      horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
+    } else {
+      // Decelerate when no input
+      horace.speed = Math.max(horace.speed - horace.deceleration * dt, 0);
+    }
+
+    if (isMoving && horace.speed > 0) {
+      const direction = input.up ? -1 : 1;
+      horace.y += direction * horace.speed * dt;
       shopTimer = 0;
 
       // Play movement sound occasionally
@@ -262,7 +274,8 @@
       }
     }
 
-    horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
+    // Keep Horace centered horizontally, only limit vertical movement
+    horace.x = LOGICAL_W / 2 - horace.w / 2;
     horace.y = Math.max(0, Math.min(LOGICAL_H - horace.h, horace.y));
 
     for (const vehicle of vehicles) {
@@ -296,12 +309,23 @@
   }
 
   function updateSki(dt) {
-    const verticalSpeed = 110 + state.loopCount * 5;
-    const horizontalSpeed = 150;
-    horace.y += verticalSpeed * dt;
-    const dx = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-    horace.x += dx * horizontalSpeed * dt;
-    horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
+    // Forward/back controls with acceleration
+    if (input.up) {
+      horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
+    } else if (input.down) {
+      horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
+    } else {
+      horace.speed = Math.max(horace.speed - horace.deceleration * dt, 0);
+    }
+
+    // Auto-scroll down the slope with player speed affecting it
+    const baseSpeed = 110 + state.loopCount * 5;
+    const direction = input.up ? -1 : (input.down ? 1 : 0);
+    const speedModifier = direction * horace.speed * 0.3;
+    horace.y += (baseSpeed + speedModifier) * dt;
+
+    // Keep centered horizontally
+    horace.x = LOGICAL_W / 2 - horace.w / 2;
 
     cameraY = Math.max(0, Math.min(slopeLength - LOGICAL_H, horace.y - LOGICAL_H * 0.3));
 
@@ -561,7 +585,6 @@
     if (overlayEl.classList.contains("hidden")) {
       if (state.mode === MODE.ROAD) updateRoad(dt);
       if (state.mode === MODE.SKI) updateSki(dt);
-      watchModeChange();
     }
 
     draw(dt);
@@ -584,15 +607,6 @@
 
   function setTouchMode(enabled) {
     touchControlsEl.classList.toggle("hidden", !enabled);
-    if (enabled) {
-      if (state.mode === MODE.SKI) {
-        dpadEl.classList.add("hidden");
-        skiPadEl.classList.remove("hidden");
-      } else {
-        dpadEl.classList.remove("hidden");
-        skiPadEl.classList.add("hidden");
-      }
-    }
   }
 
   function updateOrientationHint() {
@@ -612,22 +626,17 @@
       initAudio();
       if (event.key === "ArrowUp" || event.key === "w") input.up = true;
       if (event.key === "ArrowDown" || event.key === "s") input.down = true;
-      if (event.key === "ArrowLeft" || event.key === "a") input.left = true;
-      if (event.key === "ArrowRight" || event.key === "d") input.right = true;
-      if (event.key === " ") input.action = true;
-
-      if (!overlayEl.classList.contains("hidden") && event.key === " ") {
-        overlayEl.classList.add("hidden");
-        resetGame();
+      if (event.key === " ") {
+        if (!overlayEl.classList.contains("hidden")) {
+          overlayEl.classList.add("hidden");
+          resetGame();
+        }
       }
     });
 
     window.addEventListener("keyup", (event) => {
       if (event.key === "ArrowUp" || event.key === "w") input.up = false;
       if (event.key === "ArrowDown" || event.key === "s") input.down = false;
-      if (event.key === "ArrowLeft" || event.key === "a") input.left = false;
-      if (event.key === "ArrowRight" || event.key === "d") input.right = false;
-      if (event.key === " ") input.action = false;
     });
 
     const bindButton = (button) => {
@@ -647,14 +656,6 @@
 
     document.querySelectorAll("#touch-controls button[data-dir]").forEach(bindButton);
 
-    actionBtn.addEventListener("pointerdown", () => {
-      initAudio();
-      if (!overlayEl.classList.contains("hidden")) {
-        overlayEl.classList.add("hidden");
-        resetGame();
-      }
-    });
-
     startBtn.addEventListener("click", () => {
       initAudio();
       overlayEl.classList.add("hidden");
@@ -667,15 +668,6 @@
     setTouchMode(isTouch);
   }
 
-  function watchModeChange() {
-    if (state.mode === MODE.SKI) {
-      dpadEl.classList.add("hidden");
-      skiPadEl.classList.remove("hidden");
-    } else {
-      dpadEl.classList.remove("hidden");
-      skiPadEl.classList.add("hidden");
-    }
-  }
 
   function start() {
     resetRoad();
