@@ -19,18 +19,20 @@
       <div id="overlay-inner">
         <div id="title">HORACE GOES SKIING</div>
         <div id="subtitle">Cross the road, rent skis, slalom gates.</div>
-        <div id="controls-hint">Keyboard: arrows + space. Touch: on-screen pad.</div>
-        <button id="start">Start</button>
+        <div id="control-select">
+          <div class="control-option" data-mode="keyboard">
+            <div class="option-title">🖥️ KEYBOARD</div>
+            <div class="option-desc">Arrow keys to move</div>
+          </div>
+          <div class="control-option" data-mode="swipe">
+            <div class="option-title">📱 SWIPE</div>
+            <div class="option-desc">Swipe to move</div>
+          </div>
+        </div>
       </div>
     </div>
     <div id="rotate">
       <div>Rotate to portrait</div>
-    </div>
-    <div id="touch-controls" class="hidden">
-      <div id="updown-pad">
-        <button data-dir="up">▲</button>
-        <button data-dir="down">▼</button>
-      </div>
     </div>
   </div>
   <script src="main.js"></script>

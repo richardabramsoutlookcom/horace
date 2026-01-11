@@ -106,13 +106,42 @@ body, html {
   margin-bottom: 1rem;
 }
 
-#start {
-  background: var(--accent);
-  border: none;
-  padding: 0.6rem 1.2rem;
-  font-weight: bold;
-  border-radius: 6px;
+#control-select {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.control-option {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #f2f1ea;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.2s;
+  min-width: 140px;
+  text-align: center;
+}
+
+.control-option:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.control-option:active {
+  transform: scale(0.95);
+}
+
+.option-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+.option-desc {
+  font-size: 0.8rem;
+  opacity: 0.8;
 }
 
 #rotate {
@@ -132,39 +161,6 @@ body, html {
   display: flex;
 }
 
-#touch-controls {
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  right: 1rem;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  z-index: 3;
-  pointer-events: none;
-}
-
-#touch-controls.hidden {
-  display: none;
-}
-
-#updown-pad {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-#touch-controls button {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
-  border: 2px solid #ffffff;
-  background: var(--touch-bg);
-  color: #ffffff;
-  font-size: 1.3rem;
-  pointer-events: auto;
-  touch-action: none;
-}
 
 
 @media (max-width: 600px) {

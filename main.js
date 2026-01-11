@@ -6,9 +6,7 @@
   const modeEl = document.getElementById("mode");
   const messageEl = document.getElementById("message");
   const overlayEl = document.getElementById("overlay");
-  const startBtn = document.getElementById("start");
   const rotateEl = document.getElementById("rotate");
-  const touchControlsEl = document.getElementById("touch-controls");
 
   const LOGICAL_W = 360;
   const LOGICAL_H = 640;
@@ -26,6 +24,12 @@
     right: false,
     action: false,
   };
+
+  let controlMode = null; // 'keyboard' or 'swipe'
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  let isTouching = false;
 
   let audioContext = null;
 
@@ -236,30 +240,39 @@
       }
     });
 
-    // Forward/back controls only with acceleration
-    const isMoving = input.up || input.down;
+    // Handle movement based on control mode
+    if (controlMode === 'keyboard') {
+      // Keyboard: Forward/back controls with acceleration
+      const isMoving = input.up || input.down;
 
-    if (input.up) {
-      horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
-    } else if (input.down) {
-      horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
-    } else {
-      // Decelerate when no input
-      horace.speed = Math.max(horace.speed - horace.deceleration * dt, 0);
+      if (input.up) {
+        horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
+      } else if (input.down) {
+        horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
+      } else {
+        horace.speed = Math.max(horace.speed - horace.deceleration * dt, 0);
+      }
+
+      if (isMoving && horace.speed > 0) {
+        const direction = input.up ? -1 : 1;
+        horace.y += direction * horace.speed * dt;
+        shopTimer = 0;
+
+        const now = performance.now();
+        if (now - lastMoveSound > 100) {
+          playMove();
+          lastMoveSound = now;
+        }
+      }
+    } else if (controlMode === 'swipe') {
+      // Swipe: Step-based movement like Crossy Road
+      // Movement handled by swipe gestures (implemented in bindInput)
+      if (horace.speed > 0) {
+        horace.speed = Math.max(horace.speed - horace.deceleration * 3 * dt, 0);
+      }
     }
 
-    if (isMoving && horace.speed > 0) {
-      const direction = input.up ? -1 : 1;
-      horace.y += direction * horace.speed * dt;
-      shopTimer = 0;
-
-      // Play movement sound occasionally
-      const now = performance.now();
-      if (now - lastMoveSound > 100) {
-        playMove();
-        lastMoveSound = now;
-      }
-    } else if (isHoraceInShop()) {
+    if (isHoraceInShop()) {
       shopTimer += dt;
       if (!state.skiEquipped && shopTimer > 0.4) {
         state.skiEquipped = true;
@@ -309,23 +322,49 @@
   }
 
   function updateSki(dt) {
-    // Forward/back controls with acceleration
-    if (input.up) {
-      horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
-    } else if (input.down) {
-      horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
-    } else {
-      horace.speed = Math.max(horace.speed - horace.deceleration * dt, 0);
+    if (controlMode === 'keyboard') {
+      // Keyboard: Forward/back controls with acceleration
+      if (input.up) {
+        horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
+      } else if (input.down) {
+        horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
+      } else {
+        horace.speed = Math.max(horace.speed - horace.deceleration * dt, 0);
+      }
+
+      // Auto-scroll down the slope with player speed affecting it
+      const baseSpeed = 110 + state.loopCount * 5;
+      const direction = input.up ? -1 : (input.down ? 1 : 0);
+      const speedModifier = direction * horace.speed * 0.3;
+      horace.y += (baseSpeed + speedModifier) * dt;
+
+      // Keep centered horizontally
+      horace.x = LOGICAL_W / 2 - horace.w / 2;
+    } else if (controlMode === 'swipe') {
+      // Swipe mode: Tap to accelerate down, swipe left/right to move
+      const baseSpeed = 110 + state.loopCount * 5;
+
+      if (isTouching) {
+        // Accelerate when touching
+        horace.y += baseSpeed * 1.5 * dt;
+      } else {
+        // Normal speed when not touching
+        horace.y += baseSpeed * dt;
+      }
+
+      // Handle left/right movement from swipes
+      if (input.left) {
+        horace.x -= 200 * dt;
+        input.left = false; // Clear after applying
+      }
+      if (input.right) {
+        horace.x += 200 * dt;
+        input.right = false; // Clear after applying
+      }
+
+      // Constrain horizontal position
+      horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
     }
-
-    // Auto-scroll down the slope with player speed affecting it
-    const baseSpeed = 110 + state.loopCount * 5;
-    const direction = input.up ? -1 : (input.down ? 1 : 0);
-    const speedModifier = direction * horace.speed * 0.3;
-    horace.y += (baseSpeed + speedModifier) * dt;
-
-    // Keep centered horizontally
-    horace.x = LOGICAL_W / 2 - horace.w / 2;
 
     cameraY = Math.max(0, Math.min(slopeLength - LOGICAL_H, horace.y - LOGICAL_H * 0.3));
 
@@ -605,9 +644,6 @@
     resetRoad();
   }
 
-  function setTouchMode(enabled) {
-    touchControlsEl.classList.toggle("hidden", !enabled);
-  }
 
   function updateOrientationHint() {
     const isPortrait = window.matchMedia("(orientation: portrait)").matches;
@@ -621,59 +657,116 @@
     canvas.height = Math.floor(window.innerHeight * dpr);
   }
 
+  function handleSwipe(startX, startY, endX, endY) {
+    const deltaX = endX - startX;
+    const deltaY = endY - startY;
+    const minSwipeDistance = 30;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal swipe
+      if (Math.abs(deltaX) > minSwipeDistance) {
+        if (state.mode === MODE.SKI) {
+          // On ski level, swipe left/right moves Horace
+          if (deltaX > 0) {
+            input.right = true;
+            playMove();
+          } else {
+            input.left = true;
+            playMove();
+          }
+        }
+      }
+    } else {
+      // Vertical swipe
+      if (Math.abs(deltaY) > minSwipeDistance) {
+        if (state.mode === MODE.ROAD) {
+          // On road level, swipe up/down moves Horace
+          const stepSize = 30;
+          if (deltaY < 0) {
+            // Swipe up
+            horace.y -= stepSize;
+            playMove();
+          } else {
+            // Swipe down
+            horace.y += stepSize;
+            playMove();
+          }
+        }
+      }
+    }
+  }
+
   function bindInput() {
+    // Keyboard controls
     window.addEventListener("keydown", (event) => {
+      if (controlMode !== 'keyboard') return;
       initAudio();
       if (event.key === "ArrowUp" || event.key === "w") input.up = true;
       if (event.key === "ArrowDown" || event.key === "s") input.down = true;
-      if (event.key === " ") {
-        if (!overlayEl.classList.contains("hidden")) {
-          overlayEl.classList.add("hidden");
-          resetGame();
-        }
-      }
     });
 
     window.addEventListener("keyup", (event) => {
+      if (controlMode !== 'keyboard') return;
       if (event.key === "ArrowUp" || event.key === "w") input.up = false;
       if (event.key === "ArrowDown" || event.key === "s") input.down = false;
     });
 
-    const bindButton = (button) => {
-      const dir = button.dataset.dir;
-      const on = () => {
-        initAudio();
-        input[dir] = true;
-      };
-      const off = () => {
-        input[dir] = false;
-      };
-      button.addEventListener("pointerdown", on);
-      button.addEventListener("pointerup", off);
-      button.addEventListener("pointerleave", off);
-      button.addEventListener("pointercancel", off);
-    };
-
-    document.querySelectorAll("#touch-controls button[data-dir]").forEach(bindButton);
-
-    startBtn.addEventListener("click", () => {
+    // Swipe controls
+    canvas.addEventListener("touchstart", (event) => {
+      if (controlMode !== 'swipe') return;
       initAudio();
-      overlayEl.classList.add("hidden");
-      resetGame();
+      event.preventDefault();
+      const touch = event.touches[0];
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchStartTime = performance.now();
+      isTouching = true;
+    });
+
+    canvas.addEventListener("touchmove", (event) => {
+      if (controlMode !== 'swipe') return;
+      event.preventDefault();
+    });
+
+    canvas.addEventListener("touchend", (event) => {
+      if (controlMode !== 'swipe') return;
+      event.preventDefault();
+      const touch = event.changedTouches[0];
+      const endX = touch.clientX;
+      const endY = touch.clientY;
+      const touchDuration = performance.now() - touchStartTime;
+
+      // Only treat as swipe if quick (< 300ms)
+      if (touchDuration < 300) {
+        handleSwipe(touchStartX, touchStartY, endX, endY);
+      }
+
+      isTouching = false;
+    });
+
+    canvas.addEventListener("touchcancel", (event) => {
+      if (controlMode !== 'swipe') return;
+      event.preventDefault();
+      isTouching = false;
+    });
+
+    // Control mode selection
+    document.querySelectorAll(".control-option").forEach(option => {
+      option.addEventListener("click", () => {
+        initAudio();
+        controlMode = option.dataset.mode;
+        overlayEl.classList.add("hidden");
+        resetGame();
+      });
     });
   }
 
-  function tickTouchUI() {
-    const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    setTouchMode(isTouch);
-  }
 
 
   function start() {
     resetRoad();
     bindInput();
     setupResize();
-    tickTouchUI();
     updateOrientationHint();
     window.addEventListener("resize", () => {
       setupResize();
