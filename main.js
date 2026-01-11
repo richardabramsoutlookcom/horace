@@ -84,17 +84,50 @@
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
   }
 
-  function playBeep(freq, duration) {
+  function playBeep(freq, duration, volume = 0.08) {
     if (!audioContext) return;
     const osc = audioContext.createOscillator();
     const gain = audioContext.createGain();
     osc.type = "square";
     osc.frequency.value = freq;
-    gain.gain.value = 0.05;
+    gain.gain.value = volume;
     osc.connect(gain);
     gain.connect(audioContext.destination);
     osc.start();
     osc.stop(audioContext.currentTime + duration);
+  }
+
+  function playMove() {
+    playBeep(100, 0.05, 0.03);
+  }
+
+  function playCarHit() {
+    if (!audioContext) return;
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(200, audioContext.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start();
+    osc.stop(audioContext.currentTime + 0.3);
+  }
+
+  function playGatePass() {
+    playBeep(880, 0.08, 0.06);
+  }
+
+  function playSkiEquipped() {
+    playBeep(440, 0.1, 0.08);
+    setTimeout(() => playBeep(660, 0.1, 0.08), 100);
+    setTimeout(() => playBeep(880, 0.15, 0.08), 200);
+  }
+
+  function playModeChange() {
+    playBeep(523, 0.12, 0.08);
   }
 
   function setMessage(text, duration = 1.2) {
@@ -168,7 +201,7 @@
 
   function loseLife(reason) {
     state.lives -= 1;
-    playBeep(140, 0.25);
+    playCarHit();
     setMessage(reason || "Ouch!");
     if (state.lives <= 0) {
       state.mode = MODE.GAME_OVER;
@@ -186,8 +219,9 @@
     }
   }
 
+  let lastMoveSound = 0;
+
   function updateRoad(dt) {
-    const laneHeight = (roadLayout.bottom - roadLayout.top) / roadLayout.lanes;
     vehicles.forEach((vehicle) => {
       vehicle.x += vehicle.speed * dt;
       const buffer = 40;
@@ -205,11 +239,18 @@
       horace.x += dx * horace.speed * dt;
       horace.y += dy * horace.speed * dt;
       shopTimer = 0;
+
+      // Play movement sound occasionally
+      const now = performance.now();
+      if (now - lastMoveSound > 100) {
+        playMove();
+        lastMoveSound = now;
+      }
     } else if (isHoraceInShop()) {
       shopTimer += dt;
       if (!state.skiEquipped && shopTimer > 0.4) {
         state.skiEquipped = true;
-        playBeep(520, 0.12);
+        playSkiEquipped();
         if (!shopScored) {
           const elapsed = (performance.now() - state.crossingStart) / 1000;
           const bonus = Math.max(0, Math.floor(80 - elapsed * 10));
@@ -236,6 +277,7 @@
         return;
       }
       state.mode = MODE.SKI;
+      playModeChange();
       resetSkiRun();
       setMessage("Ski run!");
     }
@@ -257,7 +299,7 @@
         if (centerX > gate.left && centerX < gate.right) {
           gate.passed = true;
           state.score += 30;
-          playBeep(660, 0.08);
+          playGatePass();
         } else {
           loseLife("Missed gate!");
           return;
@@ -277,6 +319,7 @@
       state.mode = MODE.ROAD;
       state.skiEquipped = false;
       state.score += 150;
+      playModeChange();
       resetRoad();
       setMessage("Back to the road!");
     }
@@ -309,70 +352,126 @@
   }
 
   function drawRoad() {
-    ctx.fillStyle = getCss("--road");
+    // Sky
+    ctx.fillStyle = "#00FFFF";
+    ctx.fillRect(0, 0, LOGICAL_W, roadLayout.top);
+
+    // Road
+    ctx.fillStyle = "#404040";
     ctx.fillRect(0, roadLayout.top, LOGICAL_W, roadLayout.bottom - roadLayout.top);
 
-    ctx.fillStyle = getCss("--lane");
+    // Lane markings - retro style dashed lines
+    ctx.fillStyle = "#FFFFFF";
     const laneHeight = (roadLayout.bottom - roadLayout.top) / roadLayout.lanes;
-    for (let i = 0; i < roadLayout.lanes; i += 1) {
+    for (let i = 1; i < roadLayout.lanes; i += 1) {
       const y = roadLayout.top + laneHeight * i;
-      ctx.fillRect(0, y + laneHeight / 2 - 1, LOGICAL_W, 2);
+      for (let x = 0; x < LOGICAL_W; x += 20) {
+        ctx.fillRect(x, y - 1, 10, 2);
+      }
     }
 
-    ctx.fillStyle = getCss("--shop");
+    // Ski shop - bright retro colors
+    ctx.fillStyle = "#FF00FF";
     ctx.fillRect(shopRect.x, shopRect.y, shopRect.w, shopRect.h);
+    ctx.fillStyle = "#FFFF00";
+    ctx.font = "bold 16px monospace";
+    ctx.fillText("SKI SHOP", shopRect.x + 30, shopRect.y + 35);
 
-    ctx.fillStyle = "#f5f1df";
+    // Pavement
+    ctx.fillStyle = "#808080";
     ctx.fillRect(pavementRect.x, pavementRect.y, pavementRect.w, pavementRect.h);
 
+    // Vehicles - bright Spectrum colors
     vehicles.forEach((vehicle) => {
-      ctx.fillStyle = vehicle.speed > 0 ? "#2f7d8f" : "#b0574c";
+      ctx.fillStyle = vehicle.speed > 0 ? "#00FF00" : "#FF0000";
       ctx.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h);
+
+      // Add simple windows
+      ctx.fillStyle = "#00FFFF";
+      ctx.fillRect(vehicle.x + 4, vehicle.y + 3, vehicle.w - 8, vehicle.h - 6);
     });
   }
 
   function drawSki() {
-    ctx.fillStyle = getCss("--slope");
+    // White snowy slope
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
-    ctx.fillStyle = "#d5e8ff";
-    for (let i = 0; i < 6; i += 1) {
-      const y = ((i * 220) - (cameraY * 0.2)) % LOGICAL_H;
-      ctx.fillRect(0, y, LOGICAL_W, 8);
+    // Diagonal snow texture lines for movement effect
+    ctx.strokeStyle = "#E0E0E0";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 12; i += 1) {
+      const y = ((i * 100) - (cameraY * 0.5)) % LOGICAL_H;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(LOGICAL_W, y + 30);
+      ctx.stroke();
     }
 
+    // Draw slalom gates - bright retro colors
     gates.forEach((gate) => {
       const y = gate.y - cameraY;
       if (y < -40 || y > LOGICAL_H + 40) return;
-      ctx.strokeStyle = getCss("--gate");
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(gate.left, y);
-      ctx.lineTo(gate.left, y + 26);
-      ctx.moveTo(gate.right, y);
-      ctx.lineTo(gate.right, y + 26);
-      ctx.stroke();
 
-      ctx.fillStyle = gate.passed ? "#9dc88d" : getCss("--gate");
-      ctx.fillRect(gate.left - 6, y, 6, 12);
-      ctx.fillRect(gate.right, y, 6, 12);
+      const leftColor = gate.passed ? "#00FF00" : "#FF0000";
+      const rightColor = gate.passed ? "#00FF00" : "#0000FF";
+
+      // Left pole
+      ctx.fillStyle = leftColor;
+      ctx.fillRect(gate.left - 4, y, 8, 30);
+      ctx.fillRect(gate.left - 8, y, 16, 8);
+
+      // Right pole
+      ctx.fillStyle = rightColor;
+      ctx.fillRect(gate.right - 4, y, 8, 30);
+      ctx.fillRect(gate.right - 8, y, 16, 8);
     });
 
+    // Obstacles - trees/rocks
     obstacles.forEach((obstacle) => {
       const y = obstacle.y - cameraY;
       if (y < -30 || y > LOGICAL_H + 30) return;
-      ctx.fillStyle = "#6a7f5c";
+
+      // Draw as simple trees in Spectrum style
+      ctx.fillStyle = "#00AA00";
       ctx.beginPath();
-      ctx.arc(obstacle.x, y, obstacle.r, 0, Math.PI * 2);
+      ctx.moveTo(obstacle.x, y - obstacle.r);
+      ctx.lineTo(obstacle.x - obstacle.r, y + obstacle.r);
+      ctx.lineTo(obstacle.x + obstacle.r, y + obstacle.r);
+      ctx.closePath();
       ctx.fill();
+
+      // Trunk
+      ctx.fillStyle = "#804000";
+      ctx.fillRect(obstacle.x - 3, y + obstacle.r, 6, obstacle.r * 0.5);
     });
   }
 
   function drawHorace() {
-    ctx.fillStyle = "#2b2b2b";
-    ctx.fillRect(horace.x, horace.y - (state.mode === MODE.SKI ? cameraY : 0), horace.w, horace.h);
-    ctx.fillStyle = state.skiEquipped ? "#ffb545" : "#6b88a4";
-    ctx.fillRect(horace.x + 2, horace.y - (state.mode === MODE.SKI ? cameraY : 0) + 4, horace.w - 4, horace.h - 8);
+    const drawY = horace.y - (state.mode === MODE.SKI ? cameraY : 0);
+
+    // Draw Horace in retro Spectrum style
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(horace.x, drawY, horace.w, horace.h);
+
+    // Body
+    ctx.fillStyle = state.skiEquipped ? "#FFFF00" : "#00FFFF";
+    ctx.fillRect(horace.x + 3, drawY + 3, horace.w - 6, horace.h - 6);
+
+    // Simple face
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(horace.x + 5, drawY + 6, 3, 3);
+    ctx.fillRect(horace.x + 10, drawY + 6, 3, 3);
+
+    // Mouth
+    ctx.fillRect(horace.x + 6, drawY + 13, 6, 2);
+
+    // If skiing, draw skis
+    if (state.mode === MODE.SKI && state.skiEquipped) {
+      ctx.fillStyle = "#FF0000";
+      ctx.fillRect(horace.x + 2, drawY + horace.h, 4, 8);
+      ctx.fillRect(horace.x + horace.w - 6, drawY + horace.h, 4, 8);
+    }
   }
 
   function updateHUD() {
