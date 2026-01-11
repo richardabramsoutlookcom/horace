@@ -37,6 +37,7 @@
     score: 0,
     mode: MODE.ROAD,
     skiEquipped: false,
+    hasReturnedWithSkis: false,
     loopCount: 0,
     lastTime: 0,
     messageTime: 0,
@@ -271,11 +272,22 @@
       }
     }
 
+    // Check if reached top of screen
     if (horace.y <= 0) {
       if (!state.skiEquipped) {
         loseLife("Rent skis!");
         return;
       }
+      // Don't start skiing yet - just reached the shop
+      if (!state.hasReturnedWithSkis) {
+        setMessage("Now return across the road!");
+        return;
+      }
+    }
+
+    // Check if returned to bottom with skis
+    if (horace.y >= LOGICAL_H - horace.h - 10 && state.skiEquipped && !state.hasReturnedWithSkis) {
+      state.hasReturnedWithSkis = true;
       state.mode = MODE.SKI;
       playModeChange();
       resetSkiRun();
@@ -318,6 +330,7 @@
       state.loopCount += 1;
       state.mode = MODE.ROAD;
       state.skiEquipped = false;
+      state.hasReturnedWithSkis = false;
       state.score += 150;
       playModeChange();
       resetRoad();
@@ -352,15 +365,36 @@
   }
 
   function drawRoad() {
-    // Sky
-    ctx.fillStyle = "#00FFFF";
+    // Background - black like original
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
+
+    // Top area with ski shop
+    ctx.fillStyle = "#A0A0A0";
     ctx.fillRect(0, 0, LOGICAL_W, roadLayout.top);
+
+    // Ski shop building
+    ctx.fillStyle = "#0000FF";
+    ctx.fillRect(shopRect.x, shopRect.y + 10, shopRect.w, shopRect.h - 20);
+
+    // Shop roof
+    ctx.fillStyle = "#FF0000";
+    ctx.beginPath();
+    ctx.moveTo(shopRect.x - 10, shopRect.y + 10);
+    ctx.lineTo(shopRect.x + shopRect.w / 2, shopRect.y - 5);
+    ctx.lineTo(shopRect.x + shopRect.w + 10, shopRect.y + 10);
+    ctx.fill();
+
+    // Shop sign
+    ctx.fillStyle = "#FFFF00";
+    ctx.font = "bold 12px monospace";
+    ctx.fillText("SKIS", shopRect.x + shopRect.w / 2 - 20, shopRect.y + 40);
 
     // Road
     ctx.fillStyle = "#404040";
     ctx.fillRect(0, roadLayout.top, LOGICAL_W, roadLayout.bottom - roadLayout.top);
 
-    // Lane markings - retro style dashed lines
+    // Lane markings - dashed white lines
     ctx.fillStyle = "#FFFFFF";
     const laneHeight = (roadLayout.bottom - roadLayout.top) / roadLayout.lanes;
     for (let i = 1; i < roadLayout.lanes; i += 1) {
@@ -370,25 +404,28 @@
       }
     }
 
-    // Ski shop - bright retro colors
-    ctx.fillStyle = "#FF00FF";
-    ctx.fillRect(shopRect.x, shopRect.y, shopRect.w, shopRect.h);
-    ctx.fillStyle = "#FFFF00";
-    ctx.font = "bold 16px monospace";
-    ctx.fillText("SKI SHOP", shopRect.x + 30, shopRect.y + 35);
-
-    // Pavement
-    ctx.fillStyle = "#808080";
+    // Bottom pavement
+    ctx.fillStyle = "#A0A0A0";
     ctx.fillRect(pavementRect.x, pavementRect.y, pavementRect.w, pavementRect.h);
 
-    // Vehicles - bright Spectrum colors
+    // Vehicles - colorful blocky cars
     vehicles.forEach((vehicle) => {
-      ctx.fillStyle = vehicle.speed > 0 ? "#00FF00" : "#FF0000";
+      const mainColor = vehicle.speed > 0 ? "#FFFF00" : "#FF0000";
+      const accentColor = vehicle.speed > 0 ? "#FF00FF" : "#00FFFF";
+
+      // Car body
+      ctx.fillStyle = mainColor;
       ctx.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h);
 
-      // Add simple windows
-      ctx.fillStyle = "#00FFFF";
-      ctx.fillRect(vehicle.x + 4, vehicle.y + 3, vehicle.w - 8, vehicle.h - 6);
+      // Windows
+      ctx.fillStyle = accentColor;
+      ctx.fillRect(vehicle.x + vehicle.w * 0.2, vehicle.y + 2, vehicle.w * 0.3, vehicle.h - 4);
+      ctx.fillRect(vehicle.x + vehicle.w * 0.6, vehicle.y + 2, vehicle.w * 0.25, vehicle.h - 4);
+
+      // Wheels
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(vehicle.x + 4, vehicle.y + vehicle.h - 2, 6, 2);
+      ctx.fillRect(vehicle.x + vehicle.w - 10, vehicle.y + vehicle.h - 2, 6, 2);
     });
   }
 
@@ -450,27 +487,33 @@
   function drawHorace() {
     const drawY = horace.y - (state.mode === MODE.SKI ? cameraY : 0);
 
-    // Draw Horace in retro Spectrum style
+    // Draw Horace sprite - blocky Spectrum style character
+    const color = state.skiEquipped ? "#00FF00" : "#00FFFF";
+
+    // Horace's body is made of blocks
+    ctx.fillStyle = color;
+
+    // Head
+    ctx.fillRect(horace.x + 6, drawY + 2, 6, 6);
+
+    // Eyes
     ctx.fillStyle = "#000000";
-    ctx.fillRect(horace.x, drawY, horace.w, horace.h);
+    ctx.fillRect(horace.x + 7, drawY + 4, 2, 2);
+    ctx.fillRect(horace.x + 9, drawY + 4, 2, 2);
 
     // Body
-    ctx.fillStyle = state.skiEquipped ? "#FFFF00" : "#00FFFF";
-    ctx.fillRect(horace.x + 3, drawY + 3, horace.w - 6, horace.h - 6);
+    ctx.fillStyle = color;
+    ctx.fillRect(horace.x + 4, drawY + 8, 10, 8);
 
-    // Simple face
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(horace.x + 5, drawY + 6, 3, 3);
-    ctx.fillRect(horace.x + 10, drawY + 6, 3, 3);
-
-    // Mouth
-    ctx.fillRect(horace.x + 6, drawY + 13, 6, 2);
+    // Legs
+    ctx.fillRect(horace.x + 5, drawY + 16, 3, 6);
+    ctx.fillRect(horace.x + 10, drawY + 16, 3, 6);
 
     // If skiing, draw skis
     if (state.mode === MODE.SKI && state.skiEquipped) {
-      ctx.fillStyle = "#FF0000";
-      ctx.fillRect(horace.x + 2, drawY + horace.h, 4, 8);
-      ctx.fillRect(horace.x + horace.w - 6, drawY + horace.h, 4, 8);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(horace.x + 2, drawY + horace.h, 6, 2);
+      ctx.fillRect(horace.x + horace.w - 8, drawY + horace.h, 6, 2);
     }
   }
 
@@ -531,6 +574,7 @@
     state.score = 0;
     state.loopCount = 0;
     state.skiEquipped = false;
+    state.hasReturnedWithSkis = false;
     state.mode = MODE.ROAD;
     document.getElementById("title").textContent = "HORACE GOES SKIING";
     document.getElementById("subtitle").textContent = "Cross the road, rent skis, slalom gates.";
