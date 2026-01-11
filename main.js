@@ -287,8 +287,13 @@
       }
     }
 
-    // Keep Horace centered horizontally, only limit vertical movement
-    horace.x = LOGICAL_W / 2 - horace.w / 2;
+    // Keep Horace centered horizontally in road mode, only limit vertical movement
+    if (controlMode === 'keyboard') {
+      horace.x = LOGICAL_W / 2 - horace.w / 2;
+    } else if (controlMode === 'swipe') {
+      // Swipe mode: keep centered
+      horace.x = LOGICAL_W / 2 - horace.w / 2;
+    }
     horace.y = Math.max(0, Math.min(LOGICAL_H - horace.h, horace.y));
 
     for (const vehicle of vehicles) {
@@ -323,7 +328,7 @@
 
   function updateSki(dt) {
     if (controlMode === 'keyboard') {
-      // Keyboard: Forward/back controls with acceleration
+      // Keyboard: Forward/back controls with acceleration, left/right for steering
       if (input.up) {
         horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
       } else if (input.down) {
@@ -338,8 +343,17 @@
       const speedModifier = direction * horace.speed * 0.3;
       horace.y += (baseSpeed + speedModifier) * dt;
 
-      // Keep centered horizontally
-      horace.x = LOGICAL_W / 2 - horace.w / 2;
+      // Left/right steering
+      const steerSpeed = 200;
+      if (input.left) {
+        horace.x -= steerSpeed * dt;
+      }
+      if (input.right) {
+        horace.x += steerSpeed * dt;
+      }
+
+      // Constrain horizontal position
+      horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
     } else if (controlMode === 'swipe') {
       // Swipe mode: Tap to accelerate down, swipe left/right to move
       const baseSpeed = 110 + state.loopCount * 5;
@@ -352,18 +366,8 @@
         horace.y += baseSpeed * dt;
       }
 
-      // Handle left/right movement from swipes
-      if (input.left) {
-        horace.x -= 200 * dt;
-        input.left = false; // Clear after applying
-      }
-      if (input.right) {
-        horace.x += 200 * dt;
-        input.right = false; // Clear after applying
-      }
-
-      // Constrain horizontal position
-      horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
+      // Handle left/right movement from swipes (applied as immediate steps)
+      // Movement happens instantly when swipe is detected in handleSwipe function
     }
 
     cameraY = Math.max(0, Math.min(slopeLength - LOGICAL_H, horace.y - LOGICAL_H * 0.3));
@@ -667,13 +671,18 @@
       if (Math.abs(deltaX) > minSwipeDistance) {
         if (state.mode === MODE.SKI) {
           // On ski level, swipe left/right moves Horace
+          const stepSize = 40;
           if (deltaX > 0) {
-            input.right = true;
+            // Swipe right
+            horace.x += stepSize;
             playMove();
           } else {
-            input.left = true;
+            // Swipe left
+            horace.x -= stepSize;
             playMove();
           }
+          // Constrain position
+          horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
         }
       }
     } else {
@@ -703,12 +712,16 @@
       initAudio();
       if (event.key === "ArrowUp" || event.key === "w") input.up = true;
       if (event.key === "ArrowDown" || event.key === "s") input.down = true;
+      if (event.key === "ArrowLeft" || event.key === "a") input.left = true;
+      if (event.key === "ArrowRight" || event.key === "d") input.right = true;
     });
 
     window.addEventListener("keyup", (event) => {
       if (controlMode !== 'keyboard') return;
       if (event.key === "ArrowUp" || event.key === "w") input.up = false;
       if (event.key === "ArrowDown" || event.key === "s") input.down = false;
+      if (event.key === "ArrowLeft" || event.key === "a") input.left = false;
+      if (event.key === "ArrowRight" || event.key === "d") input.right = false;
     });
 
     // Swipe controls
