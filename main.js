@@ -242,8 +242,8 @@
 
     // Handle movement based on control mode
     if (controlMode === 'keyboard') {
-      // Keyboard: Forward/back controls with acceleration
-      const isMoving = input.up || input.down;
+      // Keyboard: All 4 directions with acceleration
+      const isMoving = input.up || input.down || input.left || input.right;
 
       if (input.up) {
         horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
@@ -254,8 +254,12 @@
       }
 
       if (isMoving && horace.speed > 0) {
-        const direction = input.up ? -1 : 1;
-        horace.y += direction * horace.speed * dt;
+        if (input.up) {
+          horace.y -= horace.speed * dt;
+        } else if (input.down) {
+          horace.y += horace.speed * dt;
+        }
+
         shopTimer = 0;
 
         const now = performance.now();
@@ -263,6 +267,15 @@
           playMove();
           lastMoveSound = now;
         }
+      }
+
+      // Left/right movement
+      const moveSpeed = 150;
+      if (input.left) {
+        horace.x -= moveSpeed * dt;
+      }
+      if (input.right) {
+        horace.x += moveSpeed * dt;
       }
     } else if (controlMode === 'swipe') {
       // Swipe: Step-based movement like Crossy Road
@@ -287,13 +300,8 @@
       }
     }
 
-    // Keep Horace centered horizontally in road mode, only limit vertical movement
-    if (controlMode === 'keyboard') {
-      horace.x = LOGICAL_W / 2 - horace.w / 2;
-    } else if (controlMode === 'swipe') {
-      // Swipe mode: keep centered
-      horace.x = LOGICAL_W / 2 - horace.w / 2;
-    }
+    // Constrain position
+    horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
     horace.y = Math.max(0, Math.min(LOGICAL_H - horace.h, horace.y));
 
     for (const vehicle of vehicles) {
@@ -553,34 +561,43 @@
 
   function drawHorace() {
     const drawY = horace.y - (state.mode === MODE.SKI ? cameraY : 0);
+    const x = horace.x;
+    const y = drawY;
 
-    // Draw Horace sprite - blocky Spectrum style character
-    const color = state.skiEquipped ? "#00FF00" : "#00FFFF";
+    // Draw Horace in original ZX Spectrum style
+    const bodyColor = state.skiEquipped ? "#00FF00" : "#0000FF"; // Blue normally, green with skis
+    const whiteColor = "#FFFFFF";
 
-    // Horace's body is made of blocks
-    ctx.fillStyle = color;
+    ctx.fillStyle = bodyColor;
 
-    // Head
-    ctx.fillRect(horace.x + 6, drawY + 2, 6, 6);
+    // Characteristic rounded head shape
+    ctx.fillRect(x + 5, y, 8, 2);      // Top of head
+    ctx.fillRect(x + 3, y + 2, 12, 4); // Head middle/wide part
+    ctx.fillRect(x + 5, y + 6, 8, 2);  // Head bottom
 
-    // Eyes
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(horace.x + 7, drawY + 4, 2, 2);
-    ctx.fillRect(horace.x + 9, drawY + 4, 2, 2);
+    // Eyes (white)
+    ctx.fillStyle = whiteColor;
+    ctx.fillRect(x + 5, y + 3, 2, 2);  // Left eye
+    ctx.fillRect(x + 11, y + 3, 2, 2); // Right eye
 
     // Body
-    ctx.fillStyle = color;
-    ctx.fillRect(horace.x + 4, drawY + 8, 10, 8);
+    ctx.fillStyle = bodyColor;
+    ctx.fillRect(x + 5, y + 8, 8, 6);  // Torso
 
-    // Legs
-    ctx.fillRect(horace.x + 5, drawY + 16, 3, 6);
-    ctx.fillRect(horace.x + 10, drawY + 16, 3, 6);
+    // Legs (distinctive tapered shape)
+    ctx.fillRect(x + 6, y + 14, 3, 4); // Left leg
+    ctx.fillRect(x + 9, y + 14, 3, 4); // Right leg
+
+    // Feet (wider)
+    ctx.fillRect(x + 5, y + 18, 3, 2); // Left foot
+    ctx.fillRect(x + 10, y + 18, 3, 2);// Right foot
 
     // If skiing, draw skis
     if (state.mode === MODE.SKI && state.skiEquipped) {
-      ctx.fillStyle = "#FFFFFF";
-      ctx.fillRect(horace.x + 2, drawY + horace.h, 6, 2);
-      ctx.fillRect(horace.x + horace.w - 8, drawY + horace.h, 6, 2);
+      ctx.fillStyle = whiteColor;
+      // Longer skis
+      ctx.fillRect(x + 3, y + 20, 2, 4);  // Left ski
+      ctx.fillRect(x + 13, y + 20, 2, 4); // Right ski
     }
   }
 
@@ -669,37 +686,31 @@
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       // Horizontal swipe
       if (Math.abs(deltaX) > minSwipeDistance) {
-        if (state.mode === MODE.SKI) {
-          // On ski level, swipe left/right moves Horace
-          const stepSize = 40;
-          if (deltaX > 0) {
-            // Swipe right
-            horace.x += stepSize;
-            playMove();
-          } else {
-            // Swipe left
-            horace.x -= stepSize;
-            playMove();
-          }
-          // Constrain position
-          horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
+        const stepSize = 40;
+        if (deltaX > 0) {
+          // Swipe right
+          horace.x += stepSize;
+          playMove();
+        } else {
+          // Swipe left
+          horace.x -= stepSize;
+          playMove();
         }
+        // Constrain position
+        horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
       }
     } else {
       // Vertical swipe
       if (Math.abs(deltaY) > minSwipeDistance) {
-        if (state.mode === MODE.ROAD) {
-          // On road level, swipe up/down moves Horace
-          const stepSize = 30;
-          if (deltaY < 0) {
-            // Swipe up
-            horace.y -= stepSize;
-            playMove();
-          } else {
-            // Swipe down
-            horace.y += stepSize;
-            playMove();
-          }
+        const stepSize = 30;
+        if (deltaY < 0) {
+          // Swipe up
+          horace.y -= stepSize;
+          playMove();
+        } else {
+          // Swipe down
+          horace.y += stepSize;
+          playMove();
         }
       }
     }
