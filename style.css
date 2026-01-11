@@ -1,0 +1,193 @@
+:root {
+  --bg-1: #f6e8d7;
+  --bg-2: #cbd8b9;
+  --road: #2a2f36;
+  --lane: #3c424a;
+  --shop: #c94c4c;
+  --slope: #e9f3ff;
+  --gate: #1e4c7a;
+  --hud: #1f2b2d;
+  --accent: #ffb545;
+  --text: #102026;
+  --danger: #e64b3c;
+  --touch-bg: rgba(0, 0, 0, 0.45);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+  font-family: "Trebuchet MS", "Arial Black", sans-serif;
+  color: var(--text);
+}
+
+#app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+}
+
+#game {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: #ffffff;
+}
+
+#hud {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  display: flex;
+  gap: 1rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid var(--hud);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+#message {
+  position: absolute;
+  top: 15%;
+  width: 100%;
+  text-align: center;
+  font-size: 1.6rem;
+  color: var(--danger);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+#overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 20, 24, 0.85);
+  color: #f2f1ea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem;
+  z-index: 4;
+}
+
+#overlay.hidden {
+  display: none;
+}
+
+#overlay-inner {
+  max-width: 420px;
+  border: 2px solid #f2f1ea;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+#title {
+  font-size: 2rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+}
+
+#subtitle {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+#controls-hint {
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+#start {
+  background: var(--accent);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#rotate {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 20, 24, 0.92);
+  color: #f2f1ea;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+#rotate.visible {
+  display: flex;
+}
+
+#touch-controls {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  z-index: 3;
+  pointer-events: none;
+}
+
+#touch-controls.hidden {
+  display: none;
+}
+
+#dpad, #ski-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+#dpad .row {
+  display: flex;
+  gap: 0.4rem;
+}
+
+#touch-controls button {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  border: 2px solid #ffffff;
+  background: var(--touch-bg);
+  color: #ffffff;
+  font-size: 1.3rem;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+#action {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #2a2f36;
+  font-weight: bold;
+}
+
+#ski-pad.hidden,
+#dpad.hidden {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  #hud {
+    font-size: 0.8rem;
+    gap: 0.6rem;
+  }
+}

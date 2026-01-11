@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Horace Goes Skiing</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game"></canvas>
+    <div id="hud">
+      <div id="score">Score: 0</div>
+      <div id="lives">Lives: 3</div>
+      <div id="mode">Mode: ROAD</div>
+    </div>
+    <div id="message"></div>
+    <div id="overlay">
+      <div id="overlay-inner">
+        <div id="title">HORACE GOES SKIING</div>
+        <div id="subtitle">Cross the road, rent skis, slalom gates.</div>
+        <div id="controls-hint">Keyboard: arrows + space. Touch: on-screen pad.</div>
+        <button id="start">Start</button>
+      </div>
+    </div>
+    <div id="rotate">
+      <div>Rotate to portrait</div>
+    </div>
+    <div id="touch-controls" class="hidden">
+      <div id="dpad">
+        <button data-dir="up">▲</button>
+        <div class="row">
+          <button data-dir="left">◀</button>
+          <button data-dir="down">▼</button>
+          <button data-dir="right">▶</button>
+        </div>
+      </div>
+      <div id="ski-pad" class="hidden">
+        <button data-dir="left">◀</button>
+        <button data-dir="right">▶</button>
+      </div>
+      <button id="action">ACTION</button>
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
