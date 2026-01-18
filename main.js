@@ -319,6 +319,39 @@
     playBeep(523, 0.12, 0.08);
   }
 
+  // ZX Spectrum beeper sounds - frequencies approximated from original
+  // Gate pass: quick high beep (success) - playGatePass at 880Hz
+  // Gate miss: lower warning buzz (penalty but continue) - playGateMiss descending
+  // Crash: descending harsh buzz (car/tree collision) - playCarHit
+  // Ski jump: ascending sweep (lift-off - wired in Phase 4) - playSkiJump
+
+  function playGateMiss() {
+    // Gate miss warning: descending "uh-oh" feel
+    // Lower frequency than gate pass, longer duration for warning effect
+    if (!audioContext) return;
+    stopCurrentSound();
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = "square";
+    gain.gain.value = 0.08;
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    currentOscillator = osc;
+
+    // Two quick descending tones: 300Hz -> 200Hz
+    const now = audioContext.currentTime;
+    osc.frequency.setValueAtTime(300, now);
+    osc.frequency.setValueAtTime(200, now + 0.08);
+
+    osc.onended = () => {
+      if (currentOscillator === osc) {
+        currentOscillator = null;
+      }
+    };
+    osc.start();
+    osc.stop(now + 0.18);
+  }
+
   function setMessage(text, duration = 1.2) {
     messageEl.textContent = text;
     state.messageTime = duration;
@@ -392,9 +425,11 @@
     cameraY = 0;
   }
 
-  function loseLife(reason) {
+  function loseLife(reason, playSound = true) {
     state.lives -= 1;
-    playCarHit();
+    if (playSound) {
+      playCarHit();
+    }
     setMessage(reason || "Ouch!");
     if (state.lives <= 0) {
       state.mode = MODE.GAME_OVER;
@@ -574,7 +609,11 @@
           state.score += 30;
           playGatePass();
         } else {
-          loseLife("Missed gate!");
+          // Gate miss: play warning sound (different from crash)
+          // NOTE: Original game may not have lost a life for gate miss
+          // (just score penalty) - defer gameplay fix to Phase 4
+          playGateMiss();
+          loseLife("Missed gate!", false); // false = skip crash sound, we played warning
           return;
         }
       }
