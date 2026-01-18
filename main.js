@@ -671,6 +671,34 @@
     });
   }
 
+  // Draw authentic ZX Spectrum-style slalom gate with flag poles
+  function drawGate(gate, cameraY) {
+    const y = gate.y - cameraY;
+    if (y < -20 || y > LOGICAL_H + 20) return;
+
+    // Color selection - passed gates turn green
+    const leftColorName = gate.passed ? 'BRIGHT_GREEN' : 'BRIGHT_RED';
+    const rightColorName = gate.passed ? 'BRIGHT_GREEN' : 'BRIGHT_BLUE';
+
+    // Left pole with flag
+    ctx.fillStyle = ZX_PALETTE[leftColorName];
+    // Pole (thin vertical)
+    ctx.fillRect(gate.left - 1, y, 3, 18);
+    // Flag at top (extends right from pole)
+    ctx.fillRect(gate.left + 2, y, 6, 4);
+    // Track attribute
+    setAttr(gate.left, y, leftColorName, 'BRIGHT_WHITE');
+
+    // Right pole with flag
+    ctx.fillStyle = ZX_PALETTE[rightColorName];
+    // Pole (thin vertical)
+    ctx.fillRect(gate.right - 1, y, 3, 18);
+    // Flag at top (extends left from pole)
+    ctx.fillRect(gate.right - 7, y, 6, 4);
+    // Track attribute
+    setAttr(gate.right, y, rightColorName, 'BRIGHT_WHITE');
+  }
+
   function drawSki() {
     // White snowy slope - bright white for ZX Spectrum
     ctx.fillStyle = ZX_PALETTE.BRIGHT_WHITE;
