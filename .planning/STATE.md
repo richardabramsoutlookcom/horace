@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 4 of 5 (Gameplay & Timing)
-Plan: Ready to plan
-Status: Phase 3 complete, ready for Phase 4
-Last activity: 2026-01-18 — Completed Phase 3 (Authentic Audio)
+Plan: 1 of 3 complete
+Status: In progress
+Last activity: 2026-01-18 — Completed 04-01-PLAN.md (Fixed Timestep & Discrete Movement)
 
-Progress: ██████░░░░ 60%
+Progress: ██████░░░░ 65%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 6 min
-- Total execution time: 0.65 hours
+- Total plans completed: 8
+- Average duration: 5 min
+- Total execution time: 0.68 hours
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: ██████░░░░ 60%
 | 1 | 2 | 20 min | 10 min |
 | 2 | 3 | 11 min | 4 min |
 | 3 | 2 | 9 min | 5 min |
+| 4 | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 2 min, 5 min, 4 min, 5 min
+- Last 5 plans: 2 min, 5 min, 4 min, 5 min, 2 min
 - Trend: Stable (fast execution)
 
 ## Accumulated Context
@@ -63,6 +64,10 @@ Recent decisions affecting current work:
 | 03-02 | Gate miss two-tone pattern (300Hz->200Hz) | Creates "uh-oh" warning distinct from crash |
 | 03-02 | Ski jump exponential frequency sweep | Natural acceleration feel for jump action |
 | 03-02 | Shared crash sound for car and tree | Matches original game behavior |
+| 04-01 | FIXED_DT = 1/50 (0.02s) | Authentic 50Hz PAL timing from original ZX Spectrum |
+| 04-01 | ROAD_STEP_SIZE = 16px | One cell height for discrete, predictable movement |
+| 04-01 | stepCooldown = 0.12s | 8 steps per second when holding key |
+| 04-01 | Ski mode stays continuous | Downhill skiing should feel smooth, not steppy |
 
 ### Pending Todos
 
@@ -74,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-18T17:00:25Z
-Stopped at: Completed 03-02-PLAN.md (Sound Effects)
+Last session: 2026-01-18T17:13:57Z
+Stopped at: Completed 04-01-PLAN.md (Fixed Timestep & Discrete Movement)
 Resume file: None
