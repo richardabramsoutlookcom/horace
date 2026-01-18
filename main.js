@@ -12,6 +12,10 @@
   const LOGICAL_W = 256;
   const LOGICAL_H = 192;
 
+  // Fixed timestep for authentic 50Hz PAL timing
+  const FIXED_DT = 1 / 50; // 0.02 seconds per update
+  let accumulator = 0;
+
   // ZX Spectrum 15-color palette (8 colors x 2 brightness, minus duplicate black)
   const ZX_PALETTE = {
     // Normal brightness (BRIGHT 0)
@@ -992,15 +996,21 @@
 
   function loop(timestamp) {
     if (!state.lastTime) state.lastTime = timestamp;
-    const dt = Math.min(0.04, (timestamp - state.lastTime) / 1000);
+    const frameDt = Math.min(0.04, (timestamp - state.lastTime) / 1000);
     state.lastTime = timestamp;
 
-    if (overlayEl.classList.contains("hidden")) {
-      if (state.mode === MODE.ROAD) updateRoad(dt);
-      if (state.mode === MODE.SKI) updateSki(dt);
+    accumulator += frameDt;
+
+    // Fixed timestep update loop - runs at consistent 50Hz
+    while (accumulator >= FIXED_DT) {
+      if (overlayEl.classList.contains("hidden")) {
+        if (state.mode === MODE.ROAD) updateRoad(FIXED_DT);
+        if (state.mode === MODE.SKI) updateSki(FIXED_DT);
+      }
+      accumulator -= FIXED_DT;
     }
 
-    draw(dt);
+    draw(frameDt); // Drawing still uses frame time for smooth visuals
     updateHUD();
     requestAnimationFrame(loop);
   }
