@@ -34,6 +34,42 @@
     BRIGHT_WHITE:   '#FFFFFF',
   };
 
+  // Horace sprite data - authentic 16x20 pixel character
+  // 0 = transparent, 1 = body (BRIGHT_BLUE), 2 = eyes (BRIGHT_WHITE), 3 = pupils (BLACK)
+  const HORACE_SPRITE = {
+    width: 16,
+    height: 20,
+    // Walking frame (facing forward)
+    walking: [
+      // Row 0-2: Top of head (rounded)
+      [0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0],
+      [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
+      [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
+      // Row 3-6: Head with eyes
+      [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
+      [0,0,0,1,1,2,2,1,1,2,2,1,1,0,0,0],
+      [0,0,0,1,1,2,3,1,1,2,3,1,1,0,0,0],
+      [0,0,0,1,1,2,2,1,1,2,2,1,1,0,0,0],
+      // Row 7-12: Body (wider blob)
+      [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
+      [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+      [0,0,0,1,1,1,1,1,1,1,1,1,1,0,0,0],
+      [0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0],
+      // Row 13-16: Legs (two stumpy legs)
+      [0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0],
+      [0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0],
+      // Row 17-19: Feet (wider than legs)
+      [0,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0],
+      [0,0,0,0,1,1,1,0,0,1,1,1,0,0,0,0],
+      [0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0],
+    ],
+    colors: ['transparent', 'BRIGHT_BLUE', 'BRIGHT_WHITE', 'BLACK']
+  };
+
   // ZX Spectrum attribute system: 32x24 blocks of 8x8 pixels
   // Each block stores: { ink: colorName, paper: colorName }
   const ATTR_COLS = 32;  // 256 / 8
