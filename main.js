@@ -3,6 +3,7 @@
   const ctx = canvas.getContext("2d");
   const scoreEl = document.getElementById("score");
   const livesEl = document.getElementById("lives");
+  const moneyEl = document.getElementById("money");
   const modeEl = document.getElementById("mode");
   const messageEl = document.getElementById("message");
   const overlayEl = document.getElementById("overlay");
@@ -174,6 +175,7 @@
   const state = {
     lives: 3,
     score: 0,
+    money: 40,  // GAME-01: Start with $40
     mode: MODE.ROAD,
     skiEquipped: false,
     hasReturnedWithSkis: false,
@@ -491,6 +493,10 @@
   }
 
   let lastMoveSound = 0;
+
+  // Road crossing discrete step movement (authentic ZX Spectrum feel)
+  const ROAD_STEP_SIZE = 16; // One cell height - discrete step
+  let stepCooldown = 0;
 
   function updateRoad(dt) {
     vehicles.forEach((vehicle) => {
@@ -951,6 +957,7 @@
   function updateHUD() {
     scoreEl.textContent = `Score: ${state.score}`;
     livesEl.textContent = `Lives: ${state.lives}`;
+    moneyEl.textContent = `$${state.money}`;
     modeEl.textContent = `Mode: ${state.mode}`;
   }
 
@@ -1018,6 +1025,7 @@
   function resetGame() {
     state.lives = 3;
     state.score = 0;
+    state.money = 40;  // GAME-01: Reset to $40
     state.loopCount = 0;
     state.skiEquipped = false;
     state.hasReturnedWithSkis = false;
