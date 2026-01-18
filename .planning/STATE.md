@@ -5,20 +5,20 @@
 See: .planning/PROJECT.md (updated 2026-01-18)
 
 **Core value:** Authentic ZX Spectrum experience — when someone plays this, it should feel like the original 1982 game.
-**Current focus:** PROJECT COMPLETE
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 5 of 5 (Presentation)
-Plan: 2 of 2 in current phase
-Status: Complete
-Last activity: 2026-01-18 — Completed 05-02-PLAN.md (Title Screen)
+Phase: Ready for next milestone
+Plan: N/A
+Status: v1.0 shipped, awaiting next milestone planning
+Last activity: 2026-01-18 — v1.0 milestone complete
 
-Progress: ██████████ 100%
+Progress: ██████████ 100% (v1.0)
 
 ## Performance Metrics
 
-**Velocity:**
+**v1.0 Velocity:**
 - Total plans completed: 12
 - Average duration: 4 min
 - Total execution time: 0.82 hours
@@ -33,66 +33,23 @@ Progress: ██████████ 100%
 | 4 | 3 | 5 min | 2 min |
 | 5 | 2 | 5 min | 3 min |
 
-**Recent Trend:**
-- Last 5 plans: 2 min, 2 min, 1 min, 2 min, 3 min
-- Trend: Stable (fast execution)
-
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-| Phase | Decision | Rationale |
-|-------|----------|-----------|
-| 01-01 | Cyan for pavements | ZX Spectrum had no gray color |
-| 01-01 | Red for tree trunks | ZX Spectrum had no brown |
-| 01-01 | Landscape orientation preferred | 256x192 is wider than tall |
-| 01-02 | Attribute tracking without strict enforcement | Foundation for sprite design awareness |
-| 01-02 | WHITE paper for SKI, BLACK for ROAD | Match visual backgrounds per mode |
-| 01-02 | Magenta debug grid | Visibility against all backgrounds |
-| 02-01 | 16x20 pixel sprite size | Fits within 2x3 attribute blocks |
-| 02-01 | Color indices for sprite data | 0=transparent, 1=body, 2=eyes, 3=pupils |
-| 02-01 | Dynamic body color substitution | BRIGHT_BLUE normal, BRIGHT_GREEN skiing |
-| 02-02 | Black windows for yellow cars | Visual contrast |
-| 02-02 | Yellow windows for red cars | Visual distinction |
-| 02-03 | Flags extend horizontally from poles | Makes gates more visible |
-| 02-03 | Trees use stacked rectangles | Blocky Spectrum look |
-| 03-01 | All oscillators use square wave only | Authentic ZX Spectrum beeper sound |
-| 03-01 | Single-channel audio via currentOscillator | Beeper could only play one sound at a time |
-| 03-01 | playSkiEquipped uses frequency changes | Single oscillator instead of overlapping sounds |
-| 03-02 | Gate miss two-tone pattern (300Hz->200Hz) | Creates "uh-oh" warning distinct from crash |
-| 03-02 | Ski jump exponential frequency sweep | Natural acceleration feel for jump action |
-| 03-02 | Shared crash sound for car and tree | Matches original game behavior |
-| 04-01 | FIXED_DT = 1/50 (0.02s) | Authentic 50Hz PAL timing from original ZX Spectrum |
-| 04-01 | ROAD_STEP_SIZE = 16px | One cell height for discrete, predictable movement |
-| 04-01 | stepCooldown = 0.12s | 8 steps per second when holding key |
-| 04-01 | Ski mode stays continuous | Downhill skiing should feel smooth, not steppy |
-| 04-02 | Ski rental blocked when money < $10 | Shows warning message instead of silent fail |
-| 04-02 | Ambulance fee always charged | Even negative money, matches original pressure |
-| 04-02 | Separate threshold tracking | lastBonusThreshold for accurate bonus detection |
-| 04-03 | Gate miss = 10 point penalty only | Original game didn't lose life for missed gates |
-| 04-03 | 30/70 bounce/crash tree collision | Creates unpredictability matching original feel |
-| 04-03 | Jump duration 0.3s | Long enough to clear obstacles, short enough for timing |
-| 04-03 | Finish bonus 100 points | Matches authentic original game values |
-| 05-01 | ZX Spectrum ROM font for text | Authentic 8x8 pixel bitmap rendering |
-| 05-01 | Canvas HUD replaces HTML DOM | All game text rendered on canvas for consistency |
-| 05-01 | HUD at top: score/money/lives | Matches original game screen layout |
-| 05-02 | Title screen as initial mode | Game starts showing canvas title, not HTML overlay |
-| 05-02 | Game over returns to title | Final score displayed on title screen |
-| 05-02 | Any key/tap shows control selection | Smooth transition from title to game |
+Decisions logged in PROJECT.md Key Decisions table.
+v1.0 decisions archived in milestones/v1.0-ROADMAP.md.
 
 ### Pending Todos
 
-None - project complete.
+None — ready for next milestone.
 
 ### Blockers/Concerns
 
-None - project complete.
+None.
 
 ## Session Continuity
 
-Last session: 2026-01-18T17:33:00Z
-Stopped at: Completed 05-02-PLAN.md (Title Screen) - PROJECT COMPLETE
+Last session: 2026-01-18
+Stopped at: v1.0 milestone complete
 Resume file: None
