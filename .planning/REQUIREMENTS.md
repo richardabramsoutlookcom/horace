@@ -27,23 +27,23 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Gameplay Authenticity
 
-- [ ] **GAME-01**: Player starts with $40
-- [ ] **GAME-02**: Each collision costs $10 ambulance fee
-- [ ] **GAME-03**: Ski rental costs $10
-- [ ] **GAME-04**: Player receives $10 bonus at every 1000-point boundary
-- [ ] **GAME-05**: Missing gates causes point loss and warning sound
-- [ ] **GAME-06**: Passing between gates awards points
-- [ ] **GAME-07**: Crossing finish line awards 100-point bonus
-- [ ] **GAME-08**: Tree collisions have variable outcome (continue or break skis)
-- [ ] **GAME-09**: Traffic moves in alternating directions per lane
-- [ ] **GAME-10**: Traffic speeds vary between vehicles
-- [ ] **GAME-11**: Traffic congestion increases over time
+- [x] **GAME-01**: Player starts with $40
+- [x] **GAME-02**: Each collision costs $10 ambulance fee
+- [x] **GAME-03**: Ski rental costs $10
+- [x] **GAME-04**: Player receives $10 bonus at every 1000-point boundary
+- [x] **GAME-05**: Missing gates causes point loss and warning sound
+- [x] **GAME-06**: Passing between gates awards points
+- [x] **GAME-07**: Crossing finish line awards 100-point bonus
+- [x] **GAME-08**: Tree collisions have variable outcome (continue or break skis)
+- [x] **GAME-09**: Traffic moves in alternating directions per lane
+- [x] **GAME-10**: Traffic speeds vary between vehicles
+- [x] **GAME-11**: Traffic congestion increases over time
 
 ### Timing/Feel
 
-- [ ] **TIME-01**: Game loop runs at 50 Hz fixed timestep
-- [ ] **TIME-02**: Movement speeds calibrated to match original feel
-- [ ] **TIME-03**: Road crossing uses discrete step movement (not continuous)
+- [x] **TIME-01**: Game loop runs at 50 Hz fixed timestep
+- [x] **TIME-02**: Movement speeds calibrated to match original feel
+- [x] **TIME-03**: Road crossing uses discrete step movement (not continuous)
 
 ### Presentation
 
@@ -100,20 +100,20 @@ Which phases cover which requirements. Updated by create-roadmap.
 | AUD-04 | Phase 3 | Complete |
 | AUD-05 | Phase 3 | Complete |
 | AUD-06 | Phase 3 | Complete |
-| TIME-01 | Phase 4 | Pending |
-| TIME-02 | Phase 4 | Pending |
-| TIME-03 | Phase 4 | Pending |
-| GAME-01 | Phase 4 | Pending |
-| GAME-02 | Phase 4 | Pending |
-| GAME-03 | Phase 4 | Pending |
-| GAME-04 | Phase 4 | Pending |
-| GAME-05 | Phase 4 | Pending |
-| GAME-06 | Phase 4 | Pending |
-| GAME-07 | Phase 4 | Pending |
-| GAME-08 | Phase 4 | Pending |
-| GAME-09 | Phase 4 | Pending |
-| GAME-10 | Phase 4 | Pending |
-| GAME-11 | Phase 4 | Pending |
+| TIME-01 | Phase 4 | Complete |
+| TIME-02 | Phase 4 | Complete |
+| TIME-03 | Phase 4 | Complete |
+| GAME-01 | Phase 4 | Complete |
+| GAME-02 | Phase 4 | Complete |
+| GAME-03 | Phase 4 | Complete |
+| GAME-04 | Phase 4 | Complete |
+| GAME-05 | Phase 4 | Complete |
+| GAME-06 | Phase 4 | Complete |
+| GAME-07 | Phase 4 | Complete |
+| GAME-08 | Phase 4 | Complete |
+| GAME-09 | Phase 4 | Complete |
+| GAME-10 | Phase 4 | Complete |
+| GAME-11 | Phase 4 | Complete |
 | PRES-01 | Phase 5 | Pending |
 | PRES-02 | Phase 5 | Pending |
 | PRES-03 | Phase 5 | Pending |
@@ -125,4 +125,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 after Phase 3 completion*
+*Last updated: 2026-01-18 after Phase 4 completion*

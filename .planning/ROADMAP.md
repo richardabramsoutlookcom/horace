@@ -9,7 +9,7 @@ Transform the existing browser game into an authentic ZX Spectrum experience. St
 - [x] **Phase 1: Visual Foundation** - Resolution, palette, attribute blocks
 - [x] **Phase 2: Authentic Sprites** - Horace, road, ski visuals
 - [x] **Phase 3: Authentic Audio** - Square wave beeper sounds
-- [ ] **Phase 4: Gameplay & Timing** - 50Hz loop, gameplay mechanics tuning
+- [x] **Phase 4: Gameplay & Timing** - 50Hz loop, gameplay mechanics tuning
 - [ ] **Phase 5: Presentation** - Font, HUD, title screen
 
 ## Phase Details
@@ -63,7 +63,8 @@ Transform the existing browser game into an authentic ZX Spectrum experience. St
   4. Tree collisions have variable outcome
   5. Traffic behaves authentically
 **Research**: Unlikely (tuning existing code, research provides guidance)
-**Plans**: TBD
+**Plans**: 3 (04-01, 04-02, 04-03)
+**Completed**: 2026-01-18
 
 ### Phase 5: Presentation
 **Goal**: Complete authentic UI presentation
@@ -84,5 +85,5 @@ Transform the existing browser game into an authentic ZX Spectrum experience. St
 | 1. Visual Foundation | 2/2 | ✓ Complete | 2026-01-18 |
 | 2. Authentic Sprites | 3/3 | ✓ Complete | 2026-01-18 |
 | 3. Authentic Audio | 2/2 | ✓ Complete | 2026-01-18 |
-| 4. Gameplay & Timing | 0/TBD | Not started | - |
+| 4. Gameplay & Timing | 3/3 | ✓ Complete | 2026-01-18 |
 | 5. Presentation | 0/TBD | Not started | - |

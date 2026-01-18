@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-18)
 
 **Core value:** Authentic ZX Spectrum experience — when someone plays this, it should feel like the original 1982 game.
-**Current focus:** Phase 4 — Gameplay & Timing (Complete)
+**Current focus:** Phase 5 — Presentation
 
 ## Current Position
 
-Phase: 4 of 5 (Gameplay & Timing)
-Plan: 3 of 3 complete
-Status: Phase complete
-Last activity: 2026-01-18 — Completed 04-03-PLAN.md (Scoring & Collision Fix)
+Phase: 5 of 5 (Presentation)
+Plan: Ready to plan
+Status: Phase 4 complete, ready for Phase 5
+Last activity: 2026-01-18 — Completed Phase 4 (Gameplay & Timing)
 
 Progress: ████████░░ 80%
 
