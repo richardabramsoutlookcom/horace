@@ -288,6 +288,7 @@
   }
 
   const MODE = {
+    TITLE: "TITLE",
     ROAD: "ROAD",
     SKI: "SKI",
     GAME_OVER: "GAME_OVER",
@@ -314,13 +315,15 @@
     lives: 3,
     score: 0,
     money: 40,  // GAME-01: Start with $40
-    mode: MODE.ROAD,
+    mode: MODE.TITLE,  // Start at title screen
     skiEquipped: false,
     hasReturnedWithSkis: false,
     loopCount: 0,
     lastTime: 0,
     messageTime: 0,
     crossingStart: 0,
+    showGameOver: false,  // Flag to show game over on title screen
+    finalScore: 0,        // Store score for game over display
   };
 
   const horace = {
@@ -1153,6 +1156,69 @@
     drawText("Lives:" + state.lives, 176, 2, 'WHITE');
   }
 
+  // Title screen state for blinking effect
+  let titleBlinkTimer = 0;
+  let titleBlinkOn = true;
+
+  // Draw title screen using ZX Spectrum font
+  function drawTitle() {
+    // Clear canvas with BLACK background
+    ctx.fillStyle = ZX_PALETTE.BLACK;
+    ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
+
+    // Game title "HORACE GOES SKIING" centered in BRIGHT_CYAN
+    const title = "HORACE GOES SKIING";
+    const titleX = Math.floor((LOGICAL_W - title.length * 8) / 2);
+    drawText(title, titleX, 50, 'BRIGHT_CYAN');
+
+    // Instructions in WHITE
+    const instr1 = "Cross the road";
+    const instr1X = Math.floor((LOGICAL_W - instr1.length * 8) / 2);
+    drawText(instr1, instr1X, 80, 'WHITE');
+
+    const instr2 = "Rent skis";
+    const instr2X = Math.floor((LOGICAL_W - instr2.length * 8) / 2);
+    drawText(instr2, instr2X, 92, 'WHITE');
+
+    const instr3 = "Slalom gates!";
+    const instr3X = Math.floor((LOGICAL_W - instr3.length * 8) / 2);
+    drawText(instr3, instr3X, 104, 'WHITE');
+
+    // Draw Horace sprite as decoration (centered below instructions)
+    const decorX = Math.floor((LOGICAL_W - HORACE_SPRITE.width) / 2);
+    const decorY = 120;
+    const sprite = HORACE_SPRITE.walking;
+    const colors = HORACE_SPRITE.colors;
+    for (let row = 0; row < HORACE_SPRITE.height; row++) {
+      for (let col = 0; col < HORACE_SPRITE.width; col++) {
+        const colorIndex = sprite[row][col];
+        if (colorIndex === 0) continue;
+        let colorName = colors[colorIndex];
+        if (colorIndex === 1) colorName = 'BRIGHT_BLUE';
+        ctx.fillStyle = ZX_PALETTE[colorName];
+        ctx.fillRect(decorX + col, decorY + row, 1, 1);
+      }
+    }
+
+    // Blinking "Press any key" prompt in BRIGHT_YELLOW
+    if (titleBlinkOn) {
+      const prompt = "Press any key";
+      const promptX = Math.floor((LOGICAL_W - prompt.length * 8) / 2);
+      drawText(prompt, promptX, 160, 'BRIGHT_YELLOW');
+    }
+
+    // If game over, show final score
+    if (state.showGameOver) {
+      const gameOver = "GAME OVER";
+      const gameOverX = Math.floor((LOGICAL_W - gameOver.length * 8) / 2);
+      drawText(gameOver, gameOverX, 20, 'BRIGHT_RED');
+
+      const finalScore = "Score: " + state.finalScore;
+      const finalScoreX = Math.floor((LOGICAL_W - finalScore.length * 8) / 2);
+      drawText(finalScore, finalScoreX, 32, 'BRIGHT_YELLOW');
+    }
+  }
+
   function getCss(varName) {
     return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
   }
@@ -1174,16 +1240,23 @@
     // Disable image smoothing for crisp pixel art
     ctx.imageSmoothingEnabled = false;
 
-    if (state.mode === MODE.ROAD) {
+    if (state.mode === MODE.TITLE) {
+      // Update blink timer
+      titleBlinkTimer += dt;
+      if (titleBlinkTimer > 0.5) {
+        titleBlinkOn = !titleBlinkOn;
+        titleBlinkTimer = 0;
+      }
+      drawTitle();
+    } else if (state.mode === MODE.ROAD) {
       drawRoad();
+      drawHorace();
+      drawHUD();
     } else if (state.mode === MODE.SKI) {
       drawSki();
+      drawHorace();
+      drawHUD();
     }
-
-    drawHorace();
-
-    // Draw HUD on canvas (after game graphics so it appears on top)
-    drawHUD();
 
     // Draw attribute grid overlay (debug visualization)
     drawAttrGrid();
