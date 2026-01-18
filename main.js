@@ -179,10 +179,10 @@
   };
 
   const horace = {
-    x: LOGICAL_W / 2 - 9,
+    x: LOGICAL_W / 2 - 8,
     y: LOGICAL_H - 24,
-    w: 18,
-    h: 22,
+    w: HORACE_SPRITE.width,  // 16
+    h: HORACE_SPRITE.height, // 20
     speed: 0,
     maxSpeed: 120,
     acceleration: 200,
@@ -277,7 +277,7 @@
   }
 
   function resetHoraceToRoad() {
-    horace.x = LOGICAL_W / 2 - 9;
+    horace.x = LOGICAL_W / 2 - HORACE_SPRITE.width / 2;
     horace.y = LOGICAL_H - 24;
     horace.speed = 0;
     shopTimer = 0;
@@ -338,7 +338,7 @@
       });
     }
 
-    horace.x = LOGICAL_W / 2 - 9;
+    horace.x = LOGICAL_W / 2 - HORACE_SPRITE.width / 2;
     horace.y = 24;
     horace.speed = 0;
     cameraY = 0;
@@ -777,49 +777,44 @@
     const x = horace.x;
     const y = drawY;
 
-    // Draw Horace in original ZX Spectrum style using palette colors
-    // Blue normally, bright green when skiing
+    // Get sprite data
+    const sprite = HORACE_SPRITE.walking;
+    const colors = HORACE_SPRITE.colors;
+
+    // Determine body color - green when skiing, blue otherwise
     const bodyColorName = state.skiEquipped ? 'BRIGHT_GREEN' : 'BRIGHT_BLUE';
-    const bodyColor = ZX_PALETTE[bodyColorName];
     const paperColor = state.mode === MODE.SKI ? 'BRIGHT_WHITE' : 'BLACK';
 
     // Track Horace in attribute system (spans multiple 8x8 blocks)
-    for (let hy = y; hy < y + horace.h; hy += 8) {
-      for (let hx = x; hx < x + horace.w; hx += 8) {
+    for (let hy = y; hy < y + HORACE_SPRITE.height; hy += 8) {
+      for (let hx = x; hx < x + HORACE_SPRITE.width; hx += 8) {
         setAttr(hx, hy, bodyColorName, paperColor);
       }
     }
 
-    ctx.fillStyle = bodyColor;
+    // Render sprite pixel by pixel
+    for (let row = 0; row < HORACE_SPRITE.height; row++) {
+      for (let col = 0; col < HORACE_SPRITE.width; col++) {
+        const colorIndex = sprite[row][col];
+        if (colorIndex === 0) continue; // transparent
 
-    // Characteristic rounded head shape
-    ctx.fillRect(x + 5, y, 8, 2);      // Top of head
-    ctx.fillRect(x + 3, y + 2, 12, 4); // Head middle/wide part
-    ctx.fillRect(x + 5, y + 6, 8, 2);  // Head bottom
+        // Get color name, substituting body color for index 1
+        let colorName = colors[colorIndex];
+        if (colorIndex === 1) {
+          colorName = bodyColorName;
+        }
 
-    // Eyes (bright white)
-    ctx.fillStyle = ZX_PALETTE.BRIGHT_WHITE;
-    ctx.fillRect(x + 5, y + 3, 2, 2);  // Left eye
-    ctx.fillRect(x + 11, y + 3, 2, 2); // Right eye
+        ctx.fillStyle = ZX_PALETTE[colorName];
+        ctx.fillRect(x + col, y + row, 1, 1);
+      }
+    }
 
-    // Body
-    ctx.fillStyle = bodyColor;
-    ctx.fillRect(x + 5, y + 8, 8, 6);  // Torso
-
-    // Legs (distinctive tapered shape)
-    ctx.fillRect(x + 6, y + 14, 3, 4); // Left leg
-    ctx.fillRect(x + 9, y + 14, 3, 4); // Right leg
-
-    // Feet (wider)
-    ctx.fillRect(x + 5, y + 18, 3, 2); // Left foot
-    ctx.fillRect(x + 10, y + 18, 3, 2);// Right foot
-
-    // If skiing, draw skis (bright white)
+    // If skiing, draw skis below the sprite (bright white)
     if (state.mode === MODE.SKI && state.skiEquipped) {
       ctx.fillStyle = ZX_PALETTE.BRIGHT_WHITE;
-      // Longer skis
-      ctx.fillRect(x + 3, y + 20, 2, 4);  // Left ski
-      ctx.fillRect(x + 13, y + 20, 2, 4); // Right ski
+      // Skis positioned below feet
+      ctx.fillRect(x + 4, y + HORACE_SPRITE.height, 2, 4);  // Left ski
+      ctx.fillRect(x + 10, y + HORACE_SPRITE.height, 2, 4); // Right ski
     }
   }
 
