@@ -541,6 +541,38 @@
     return dx * dx + dy * dy < c.r * c.r;
   }
 
+  function drawVehicle(vehicle) {
+    const isMovingRight = vehicle.speed > 0;
+    const bodyColorName = isMovingRight ? 'BRIGHT_YELLOW' : 'BRIGHT_RED';
+    const windowColorName = isMovingRight ? 'BLACK' : 'BRIGHT_YELLOW';
+
+    // Main body - full rectangle
+    ctx.fillStyle = ZX_PALETTE[bodyColorName];
+    ctx.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h);
+
+    // Windows - simple rectangles (2 windows per car)
+    ctx.fillStyle = ZX_PALETTE[windowColorName];
+    const windowW = Math.floor(vehicle.w * 0.2);
+    const windowH = vehicle.h - 4;
+    const windowY = vehicle.y + 2;
+    // Front window
+    ctx.fillRect(vehicle.x + Math.floor(vehicle.w * 0.6), windowY, windowW, windowH);
+    // Back window
+    ctx.fillRect(vehicle.x + Math.floor(vehicle.w * 0.2), windowY, windowW, windowH);
+
+    // Wheels - black rectangles at bottom
+    ctx.fillStyle = ZX_PALETTE.BLACK;
+    ctx.fillRect(vehicle.x + 2, vehicle.y + vehicle.h - 3, 4, 3);
+    ctx.fillRect(vehicle.x + vehicle.w - 6, vehicle.y + vehicle.h - 3, 4, 3);
+
+    // Track in attribute system
+    for (let vy = vehicle.y; vy < vehicle.y + vehicle.h; vy += 8) {
+      for (let vx = vehicle.x; vx < vehicle.x + vehicle.w; vx += 8) {
+        setAttr(vx, vy, bodyColorName, 'BLACK');
+      }
+    }
+  }
+
   function drawRoad() {
     // Background - black like original ZX Spectrum
     ctx.fillStyle = ZX_PALETTE.BLACK;
