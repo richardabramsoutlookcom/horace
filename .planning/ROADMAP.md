@@ -7,7 +7,7 @@ Transform the existing browser game into an authentic ZX Spectrum experience. St
 ## Phases
 
 - [x] **Phase 1: Visual Foundation** - Resolution, palette, attribute blocks
-- [ ] **Phase 2: Authentic Sprites** - Horace, road, ski visuals
+- [x] **Phase 2: Authentic Sprites** - Horace, road, ski visuals
 - [ ] **Phase 3: Authentic Audio** - Square wave beeper sounds
 - [ ] **Phase 4: Gameplay & Timing** - 50Hz loop, gameplay mechanics tuning
 - [ ] **Phase 5: Presentation** - Font, HUD, title screen
@@ -36,7 +36,8 @@ Transform the existing browser game into an authentic ZX Spectrum experience. St
   3. Ski slope has red/blue flag gates and authentic trees
 **Research**: Likely (need exact sprite data)
 **Research topics**: Original Horace sprite pixels, car/tree sprites, flag gate graphics
-**Plans**: TBD
+**Plans**: 3 (02-01, 02-02, 02-03)
+**Completed**: 2026-01-18
 
 ### Phase 3: Authentic Audio
 **Goal**: Replace modern sounds with authentic beeper audio
@@ -80,7 +81,7 @@ Transform the existing browser game into an authentic ZX Spectrum experience. St
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Visual Foundation | 2/2 | ✓ Complete | 2026-01-18 |
-| 2. Authentic Sprites | 0/TBD | Not started | - |
+| 2. Authentic Sprites | 3/3 | ✓ Complete | 2026-01-18 |
 | 3. Authentic Audio | 0/TBD | Not started | - |
 | 4. Gameplay & Timing | 0/TBD | Not started | - |
 | 5. Presentation | 0/TBD | Not started | - |

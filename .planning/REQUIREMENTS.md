@@ -12,9 +12,9 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **VIS-01**: Game renders at 256x192 native resolution with integer scaling
 - [x] **VIS-02**: All colors use exact ZX Spectrum 15-color palette
 - [x] **VIS-03**: 8x8 attribute blocks enforce 2-color-per-block constraint (color clash)
-- [ ] **VIS-04**: Horace sprite matches original (blue blob, big eyes, stumpy legs, tail/mullet)
-- [ ] **VIS-05**: Road crossing visuals use authentic Spectrum colors and style
-- [ ] **VIS-06**: Ski slope visuals use authentic red/blue flag gates, trees, snow
+- [x] **VIS-04**: Horace sprite matches original (blue blob, big eyes, stumpy legs, tail/mullet)
+- [x] **VIS-05**: Road crossing visuals use authentic Spectrum colors and style
+- [x] **VIS-06**: Ski slope visuals use authentic red/blue flag gates, trees, snow
 
 ### Audio Authenticity
 
@@ -91,9 +91,9 @@ Which phases cover which requirements. Updated by create-roadmap.
 | VIS-01 | Phase 1 | Complete |
 | VIS-02 | Phase 1 | Complete |
 | VIS-03 | Phase 1 | Complete |
-| VIS-04 | Phase 2 | Pending |
-| VIS-05 | Phase 2 | Pending |
-| VIS-06 | Phase 2 | Pending |
+| VIS-04 | Phase 2 | Complete |
+| VIS-05 | Phase 2 | Complete |
+| VIS-06 | Phase 2 | Complete |
 | AUD-01 | Phase 3 | Pending |
 | AUD-02 | Phase 3 | Pending |
 | AUD-03 | Phase 3 | Pending |
@@ -125,4 +125,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 after Phase 1 completion*
+*Last updated: 2026-01-18 after Phase 2 completion*
