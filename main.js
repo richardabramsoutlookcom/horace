@@ -624,11 +624,11 @@
     }
     setMessage(reason || "Ouch!");
     if (state.lives <= 0) {
-      state.mode = MODE.GAME_OVER;
-      overlayEl.classList.remove("hidden");
-      document.getElementById("title").textContent = "GAME OVER";
-      document.getElementById("subtitle").textContent = `Final score: ${state.score}`;
-      document.getElementById("controls-hint").textContent = "Press Start to play again.";
+      // Game over - return to title screen with score display
+      state.finalScore = state.score;
+      state.showGameOver = true;
+      state.mode = MODE.TITLE;
+      // Keep overlay hidden - title screen handles game over display
       return;
     }
 
@@ -1298,10 +1298,9 @@
     state.loopCount = 0;
     state.skiEquipped = false;
     state.hasReturnedWithSkis = false;
+    state.showGameOver = false;
+    state.finalScore = 0;
     state.mode = MODE.ROAD;
-    document.getElementById("title").textContent = "HORACE GOES SKIING";
-    document.getElementById("subtitle").textContent = "Cross the road, rent skis, slalom gates.";
-    document.getElementById("controls-hint").textContent = "Keyboard: arrows + space. Touch: on-screen pad.";
     resetRoad();
   }
 
@@ -1358,9 +1357,31 @@
     }
   }
 
+  // Handle transition from title screen to control selection
+  function handleTitleInput() {
+    if (state.mode === MODE.TITLE) {
+      initAudio();
+      // Clear game over flag
+      state.showGameOver = false;
+      // Show control selection overlay
+      overlayEl.classList.remove("hidden");
+      // Update overlay text for starting game
+      document.getElementById("title").textContent = "HORACE GOES SKIING";
+      document.getElementById("subtitle").textContent = "Select control method";
+    }
+  }
+
   function bindInput() {
-    // Keyboard controls
+    // Title screen keyboard handler - any key shows control selection
     window.addEventListener("keydown", (event) => {
+      if (state.mode === MODE.TITLE && !overlayEl.classList.contains("hidden")) {
+        return; // Overlay already visible
+      }
+      if (state.mode === MODE.TITLE) {
+        handleTitleInput();
+        return;
+      }
+      // Regular gameplay keyboard controls
       if (controlMode !== 'keyboard') return;
       initAudio();
       if (event.key === "ArrowUp" || event.key === "w") input.up = true;
@@ -1379,8 +1400,15 @@
       if (event.key === " " || event.key === "Space") input.action = false;
     });
 
-    // Swipe controls
+    // Touch handler for title screen - any tap shows control selection
     canvas.addEventListener("touchstart", (event) => {
+      // Handle title screen tap (if overlay not already showing)
+      if (state.mode === MODE.TITLE && overlayEl.classList.contains("hidden")) {
+        handleTitleInput();
+        event.preventDefault();
+        return;
+      }
+      // Regular swipe controls
       if (controlMode !== 'swipe') return;
       initAudio();
       event.preventDefault();
@@ -1440,7 +1468,6 @@
 
   function start() {
     clearAttrs();  // Initialize attribute buffer
-    resetRoad();
     bindInput();
     setupResize();
     updateOrientationHint();
@@ -1450,7 +1477,9 @@
     });
     state.lastTime = 0;
 
-    state.mode = MODE.ROAD;
+    // Start at title screen with overlay hidden
+    state.mode = MODE.TITLE;
+    overlayEl.classList.add("hidden");
     requestAnimationFrame(loop);
   }
 
