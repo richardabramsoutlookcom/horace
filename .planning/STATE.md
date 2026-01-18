@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-01-18)
 
 **Core value:** Authentic ZX Spectrum experience — when someone plays this, it should feel like the original 1982 game.
-**Current focus:** Phase 1 — Visual Foundation
+**Current focus:** Phase 2 — Authentic Sprites
 
 ## Current Position
 
-Phase: 1 of 5 (Visual Foundation)
-Plan: 2 of TBD in current phase
-Status: In progress
-Last activity: 2026-01-18 — Completed 01-02-PLAN.md
+Phase: 2 of 5 (Authentic Sprites)
+Plan: Ready to plan
+Status: Phase 1 complete, ready for Phase 2
+Last activity: 2026-01-18 — Completed Phase 1 (Visual Foundation)
 
 Progress: ██░░░░░░░░ 20%
 
