@@ -495,6 +495,18 @@
 
   let lastMoveSound = 0;
 
+  // GAME-04: Track last awarded bonus level for 1000-point bonuses
+  let lastBonusThreshold = 0;
+
+  function checkPointBonus() {
+    const threshold = Math.floor(state.score / 1000) * 1000;
+    if (threshold > lastBonusThreshold && threshold > 0) {
+      state.money += 10;  // $10 bonus
+      lastBonusThreshold = threshold;
+      setMessage("$10 bonus!");
+    }
+  }
+
   // Road crossing discrete step movement (authentic ZX Spectrum feel)
   const ROAD_STEP_SIZE = 16; // One cell height - discrete step
   let stepCooldown = 0;
@@ -547,15 +559,22 @@
     if (isHoraceInShop()) {
       shopTimer += dt;
       if (!state.skiEquipped && shopTimer > 0.4) {
-        state.skiEquipped = true;
-        playSkiEquipped();
-        if (!shopScored) {
-          const elapsed = (performance.now() - state.crossingStart) / 1000;
-          const bonus = Math.max(0, Math.floor(80 - elapsed * 10));
-          state.score += 120 + bonus;
-          shopScored = true;
+        // GAME-03: Ski rental costs $10
+        if (state.money >= 10) {
+          state.money -= 10;  // Ski rental
+          state.skiEquipped = true;
+          playSkiEquipped();
+          if (!shopScored) {
+            const elapsed = (performance.now() - state.crossingStart) / 1000;
+            const bonus = Math.max(0, Math.floor(80 - elapsed * 10));
+            state.score += 120 + bonus;
+            checkPointBonus();  // Check for 1000-point bonus
+            shopScored = true;
+          }
+          setMessage("Skis equipped!");
+        } else {
+          setMessage("Need $10 for skis!");
         }
-        setMessage("Skis equipped!");
       }
     }
 
@@ -645,6 +664,7 @@
         if (centerX > gate.left && centerX < gate.right) {
           gate.passed = true;
           state.score += 30;
+          checkPointBonus();  // Check for 1000-point bonus
           playGatePass();
         } else {
           // Gate miss: play warning sound (different from crash)
@@ -670,6 +690,7 @@
       state.skiEquipped = false;
       state.hasReturnedWithSkis = false;
       state.score += 150;
+      checkPointBonus();  // Check for 1000-point bonus
       playModeChange();
       resetRoad();
       setMessage("Back to the road!");
@@ -1015,6 +1036,7 @@
     state.lives = 3;
     state.score = 0;
     state.money = 40;  // GAME-01: Reset to $40
+    lastBonusThreshold = 0;  // GAME-04: Reset bonus tracking
     state.loopCount = 0;
     state.skiEquipped = false;
     state.hasReturnedWithSkis = false;
