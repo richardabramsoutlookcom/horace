@@ -18,12 +18,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Audio Authenticity
 
-- [ ] **AUD-01**: All sounds use square wave oscillators only (no sawtooth/sine)
-- [ ] **AUD-02**: Audio is single-channel (new sound interrupts previous)
-- [ ] **AUD-03**: Gate pass sound matches original frequency/duration
-- [ ] **AUD-04**: Gate miss warning sound matches original
-- [ ] **AUD-05**: Collision/crash sounds match original beeper style
-- [ ] **AUD-06**: Ski jump sound matches original "bizarre jumping sound"
+- [x] **AUD-01**: All sounds use square wave oscillators only (no sawtooth/sine)
+- [x] **AUD-02**: Audio is single-channel (new sound interrupts previous)
+- [x] **AUD-03**: Gate pass sound matches original frequency/duration
+- [x] **AUD-04**: Gate miss warning sound matches original
+- [x] **AUD-05**: Collision/crash sounds match original beeper style
+- [x] **AUD-06**: Ski jump sound matches original "bizarre jumping sound"
 
 ### Gameplay Authenticity
 
@@ -94,12 +94,12 @@ Which phases cover which requirements. Updated by create-roadmap.
 | VIS-04 | Phase 2 | Complete |
 | VIS-05 | Phase 2 | Complete |
 | VIS-06 | Phase 2 | Complete |
-| AUD-01 | Phase 3 | Pending |
-| AUD-02 | Phase 3 | Pending |
-| AUD-03 | Phase 3 | Pending |
-| AUD-04 | Phase 3 | Pending |
-| AUD-05 | Phase 3 | Pending |
-| AUD-06 | Phase 3 | Pending |
+| AUD-01 | Phase 3 | Complete |
+| AUD-02 | Phase 3 | Complete |
+| AUD-03 | Phase 3 | Complete |
+| AUD-04 | Phase 3 | Complete |
+| AUD-05 | Phase 3 | Complete |
+| AUD-06 | Phase 3 | Complete |
 | TIME-01 | Phase 4 | Pending |
 | TIME-02 | Phase 4 | Pending |
 | TIME-03 | Phase 4 | Pending |
@@ -125,4 +125,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 after Phase 2 completion*
+*Last updated: 2026-01-18 after Phase 3 completion*
