@@ -725,51 +725,14 @@
       }
     }
 
-    // Draw slalom gates - authentic ZX Spectrum colors
+    // Draw slalom gates using helper
     gates.forEach((gate) => {
-      const y = gate.y - cameraY;
-      if (y < -20 || y > LOGICAL_H + 20) return;
-
-      // Passed gates turn green, otherwise red/blue
-      const leftColorName = gate.passed ? 'BRIGHT_GREEN' : 'BRIGHT_RED';
-      const rightColorName = gate.passed ? 'BRIGHT_GREEN' : 'BRIGHT_BLUE';
-      const leftColor = ZX_PALETTE[leftColorName];
-      const rightColor = ZX_PALETTE[rightColorName];
-
-      // Left pole (smaller for 192 height)
-      ctx.fillStyle = leftColor;
-      ctx.fillRect(gate.left - 2, y, 4, 16);
-      ctx.fillRect(gate.left - 4, y, 8, 4);
-      // Track left pole in attribute system
-      setAttr(gate.left, y, leftColorName, 'BRIGHT_WHITE');
-
-      // Right pole
-      ctx.fillStyle = rightColor;
-      ctx.fillRect(gate.right - 2, y, 4, 16);
-      ctx.fillRect(gate.right - 4, y, 8, 4);
-      // Track right pole in attribute system
-      setAttr(gate.right, y, rightColorName, 'BRIGHT_WHITE');
+      drawGate(gate, cameraY);
     });
 
-    // Obstacles - trees in ZX Spectrum colors
+    // Draw tree obstacles using helper
     obstacles.forEach((obstacle) => {
-      const y = obstacle.y - cameraY;
-      if (y < -16 || y > LOGICAL_H + 16) return;
-
-      // Draw as simple trees in Spectrum style - green canopy
-      ctx.fillStyle = ZX_PALETTE.GREEN;
-      ctx.beginPath();
-      ctx.moveTo(obstacle.x, y - obstacle.r);
-      ctx.lineTo(obstacle.x - obstacle.r, y + obstacle.r);
-      ctx.lineTo(obstacle.x + obstacle.r, y + obstacle.r);
-      ctx.closePath();
-      ctx.fill();
-      // Track tree canopy in attribute system
-      setAttr(obstacle.x, y, 'GREEN', 'BRIGHT_WHITE');
-
-      // Trunk - red or yellow (ZX Spectrum didn't have brown)
-      ctx.fillStyle = ZX_PALETTE.RED;
-      ctx.fillRect(obstacle.x - 2, y + obstacle.r, 4, obstacle.r * 0.4);
+      drawTree(obstacle, cameraY);
     });
   }
 
