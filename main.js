@@ -1137,10 +1137,20 @@
   }
 
   function updateHUD() {
-    scoreEl.textContent = `Score: ${state.score}`;
-    livesEl.textContent = `Lives: ${state.lives}`;
-    moneyEl.textContent = `$${state.money}`;
-    modeEl.textContent = `Mode: ${state.mode}`;
+    // HTML HUD removed - now using canvas-based rendering with ZX Spectrum font
+    // See drawHUD() function called from draw()
+  }
+
+  // Draw HUD on canvas using ZX Spectrum bitmap font
+  function drawHUD() {
+    // Score at top-left in white
+    drawText("Score:" + state.score, 8, 2, 'WHITE');
+
+    // Money next to score in bright yellow
+    drawText("$" + state.money, 96, 2, 'BRIGHT_YELLOW');
+
+    // Lives at top-right area in white
+    drawText("Lives:" + state.lives, 176, 2, 'WHITE');
   }
 
   function getCss(varName) {
@@ -1171,6 +1181,9 @@
     }
 
     drawHorace();
+
+    // Draw HUD on canvas (after game graphics so it appears on top)
+    drawHUD();
 
     // Draw attribute grid overlay (debug visualization)
     drawAttrGrid();
