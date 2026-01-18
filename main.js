@@ -34,6 +34,80 @@
     BRIGHT_WHITE:   '#FFFFFF',
   };
 
+  // ZX Spectrum attribute system: 32x24 blocks of 8x8 pixels
+  // Each block stores: { ink: colorName, paper: colorName }
+  const ATTR_COLS = 32;  // 256 / 8
+  const ATTR_ROWS = 24;  // 192 / 8
+  let attrBuffer = [];
+
+  function clearAttrs(paperColor = 'BLACK') {
+    attrBuffer = [];
+    for (let i = 0; i < ATTR_ROWS * ATTR_COLS; i++) {
+      attrBuffer[i] = { ink: null, paper: paperColor };
+    }
+  }
+
+  function getAttrIndex(x, y) {
+    const col = Math.floor(x / 8);
+    const row = Math.floor(y / 8);
+    if (col < 0 || col >= ATTR_COLS || row < 0 || row >= ATTR_ROWS) return -1;
+    return row * ATTR_COLS + col;
+  }
+
+  function setAttr(x, y, ink, paper = null) {
+    const idx = getAttrIndex(x, y);
+    if (idx < 0) return;
+    if (ink) attrBuffer[idx].ink = ink;
+    if (paper) attrBuffer[idx].paper = paper;
+  }
+
+  function getAttr(x, y) {
+    const idx = getAttrIndex(x, y);
+    if (idx < 0) return { ink: 'WHITE', paper: 'BLACK' };
+    return attrBuffer[idx];
+  }
+
+  // Get valid color for a pixel position based on attribute
+  function getValidColor(x, y, desiredColor) {
+    const attr = getAttr(x, y);
+    // If this color is already ink or paper, use it
+    if (desiredColor === attr.ink || desiredColor === attr.paper) {
+      return ZX_PALETTE[desiredColor];
+    }
+    // If ink is not set, set it
+    if (!attr.ink) {
+      setAttr(x, y, desiredColor);
+      return ZX_PALETTE[desiredColor];
+    }
+    // If paper matches, return ink (color clash!)
+    if (attr.paper === desiredColor) {
+      return ZX_PALETTE[attr.ink];
+    }
+    // Otherwise return ink (color clash - can only have 2 colors)
+    return ZX_PALETTE[attr.ink];
+  }
+
+  // Debug visualization toggle
+  let showAttrGrid = false; // Toggle with 'G' key for debug
+
+  function drawAttrGrid() {
+    if (!showAttrGrid) return;
+    ctx.strokeStyle = 'rgba(255, 0, 255, 0.3)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= 256; x += 8) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 192);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= 192; y += 8) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(256, y);
+      ctx.stroke();
+    }
+  }
+
   const MODE = {
     ROAD: "ROAD",
     SKI: "SKI",
@@ -818,11 +892,19 @@
         resetGame();
       });
     });
+
+    // Debug controls (work regardless of control mode)
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "g" || event.key === "G") {
+        showAttrGrid = !showAttrGrid;
+      }
+    });
   }
 
 
 
   function start() {
+    clearAttrs();  // Initialize attribute buffer
     resetRoad();
     bindInput();
     setupResize();
