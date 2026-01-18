@@ -465,6 +465,7 @@
         x: 16 + Math.random() * (LOGICAL_W - 32),
         y: 100 + Math.random() * (slopeLength - 200),
         r: 8 + Math.random() * 4,
+        hit: false,  // GAME-08: Track if tree was already hit
       });
     }
 
@@ -695,12 +696,25 @@
       }
     }
 
-    // Tree collision - skip if jumping (can jump over trees)
+    // GAME-08: Tree collision with variable outcome
+    // Skip if jumping (can jump over trees)
     for (const obstacle of obstacles) {
-      if (!isJumping && circleRectOverlap(obstacle, horace)) {
-        playTreeCrash();
-        loseLife("Hit obstacle!", false);
-        return;
+      if (!isJumping && !obstacle.hit && circleRectOverlap(obstacle, horace)) {
+        obstacle.hit = true;  // Prevent repeat collision
+
+        // Variable outcome: 30% chance to bounce and continue
+        if (Math.random() < 0.3) {
+          // Lucky bounce - push player to the side
+          playTreeCrash();  // Still play sound
+          horace.x += (Math.random() > 0.5 ? 1 : -1) * 24;  // Bounce left or right
+          horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
+          setMessage("Lucky bounce!");
+        } else {
+          // Crash - lose life and skis (70% chance)
+          playTreeCrash();
+          loseLife("Crashed into tree!", false);
+          return;
+        }
       }
     }
 
