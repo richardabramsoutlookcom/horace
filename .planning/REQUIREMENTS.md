@@ -88,41 +88,41 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VIS-01 | — | Pending |
-| VIS-02 | — | Pending |
-| VIS-03 | — | Pending |
-| VIS-04 | — | Pending |
-| VIS-05 | — | Pending |
-| VIS-06 | — | Pending |
-| AUD-01 | — | Pending |
-| AUD-02 | — | Pending |
-| AUD-03 | — | Pending |
-| AUD-04 | — | Pending |
-| AUD-05 | — | Pending |
-| AUD-06 | — | Pending |
-| GAME-01 | — | Pending |
-| GAME-02 | — | Pending |
-| GAME-03 | — | Pending |
-| GAME-04 | — | Pending |
-| GAME-05 | — | Pending |
-| GAME-06 | — | Pending |
-| GAME-07 | — | Pending |
-| GAME-08 | — | Pending |
-| GAME-09 | — | Pending |
-| GAME-10 | — | Pending |
-| GAME-11 | — | Pending |
-| TIME-01 | — | Pending |
-| TIME-02 | — | Pending |
-| TIME-03 | — | Pending |
-| PRES-01 | — | Pending |
-| PRES-02 | — | Pending |
-| PRES-03 | — | Pending |
+| VIS-01 | Phase 1 | Pending |
+| VIS-02 | Phase 1 | Pending |
+| VIS-03 | Phase 1 | Pending |
+| VIS-04 | Phase 2 | Pending |
+| VIS-05 | Phase 2 | Pending |
+| VIS-06 | Phase 2 | Pending |
+| AUD-01 | Phase 3 | Pending |
+| AUD-02 | Phase 3 | Pending |
+| AUD-03 | Phase 3 | Pending |
+| AUD-04 | Phase 3 | Pending |
+| AUD-05 | Phase 3 | Pending |
+| AUD-06 | Phase 3 | Pending |
+| TIME-01 | Phase 4 | Pending |
+| TIME-02 | Phase 4 | Pending |
+| TIME-03 | Phase 4 | Pending |
+| GAME-01 | Phase 4 | Pending |
+| GAME-02 | Phase 4 | Pending |
+| GAME-03 | Phase 4 | Pending |
+| GAME-04 | Phase 4 | Pending |
+| GAME-05 | Phase 4 | Pending |
+| GAME-06 | Phase 4 | Pending |
+| GAME-07 | Phase 4 | Pending |
+| GAME-08 | Phase 4 | Pending |
+| GAME-09 | Phase 4 | Pending |
+| GAME-10 | Phase 4 | Pending |
+| GAME-11 | Phase 4 | Pending |
+| PRES-01 | Phase 5 | Pending |
+| PRES-02 | Phase 5 | Pending |
+| PRES-03 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25 ⚠️
+- Mapped to phases: 25
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 after initial definition*
+*Last updated: 2026-01-18 after roadmap creation*
