@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-18)
 
 **Core value:** Authentic ZX Spectrum experience — when someone plays this, it should feel like the original 1982 game.
-**Current focus:** Phase 5 — Presentation
+**Current focus:** PROJECT COMPLETE
 
 ## Current Position
 
 Phase: 5 of 5 (Presentation)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-18 — Completed 05-01-PLAN.md (Spectrum Font & HUD)
+Plan: 2 of 2 in current phase
+Status: Complete
+Last activity: 2026-01-18 — Completed 05-02-PLAN.md (Title Screen)
 
-Progress: █████████░ 92%
+Progress: ██████████ 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 4 min
-- Total execution time: 0.77 hours
+- Total execution time: 0.82 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: █████████░ 92%
 | 2 | 3 | 11 min | 4 min |
 | 3 | 2 | 9 min | 5 min |
 | 4 | 3 | 5 min | 2 min |
-| 5 | 1 | 2 min | 2 min |
+| 5 | 2 | 5 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 2 min, 2 min, 1 min, 2 min
+- Last 5 plans: 2 min, 2 min, 1 min, 2 min, 3 min
 - Trend: Stable (fast execution)
 
 ## Accumulated Context
@@ -79,17 +79,20 @@ Recent decisions affecting current work:
 | 05-01 | ZX Spectrum ROM font for text | Authentic 8x8 pixel bitmap rendering |
 | 05-01 | Canvas HUD replaces HTML DOM | All game text rendered on canvas for consistency |
 | 05-01 | HUD at top: score/money/lives | Matches original game screen layout |
+| 05-02 | Title screen as initial mode | Game starts showing canvas title, not HTML overlay |
+| 05-02 | Game over returns to title | Final score displayed on title screen |
+| 05-02 | Any key/tap shows control selection | Smooth transition from title to game |
 
 ### Pending Todos
 
-None yet.
+None - project complete.
 
 ### Blockers/Concerns
 
-None yet.
+None - project complete.
 
 ## Session Continuity
 
-Last session: 2026-01-18T17:27:55Z
-Stopped at: Completed 05-01-PLAN.md (Spectrum Font & HUD)
+Last session: 2026-01-18T17:33:00Z
+Stopped at: Completed 05-02-PLAN.md (Title Screen) - PROJECT COMPLETE
 Resume file: None
