@@ -643,31 +643,9 @@
       }
     }
 
-    // Vehicles - colorful blocky cars using ZX palette
+    // Vehicles - authentic ZX Spectrum blocky cars
     vehicles.forEach((vehicle) => {
-      const mainColorName = vehicle.speed > 0 ? 'BRIGHT_YELLOW' : 'BRIGHT_RED';
-      const mainColor = ZX_PALETTE[mainColorName];
-      const accentColor = vehicle.speed > 0 ? ZX_PALETTE.BRIGHT_MAGENTA : ZX_PALETTE.BRIGHT_CYAN;
-
-      // Car body
-      ctx.fillStyle = mainColor;
-      ctx.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h);
-      // Track vehicle in attribute system
-      for (let vy = vehicle.y; vy < vehicle.y + vehicle.h; vy += 8) {
-        for (let vx = vehicle.x; vx < vehicle.x + vehicle.w; vx += 8) {
-          setAttr(vx, vy, mainColorName, 'BLACK');
-        }
-      }
-
-      // Windows (proportional for smaller cars)
-      ctx.fillStyle = accentColor;
-      ctx.fillRect(vehicle.x + vehicle.w * 0.2, vehicle.y + 2, vehicle.w * 0.3, vehicle.h - 4);
-      ctx.fillRect(vehicle.x + vehicle.w * 0.55, vehicle.y + 2, vehicle.w * 0.25, vehicle.h - 4);
-
-      // Wheels
-      ctx.fillStyle = ZX_PALETTE.BLACK;
-      ctx.fillRect(vehicle.x + 2, vehicle.y + vehicle.h - 2, 4, 2);
-      ctx.fillRect(vehicle.x + vehicle.w - 6, vehicle.y + vehicle.h - 2, 4, 2);
+      drawVehicle(vehicle);
     });
   }
 
@@ -697,6 +675,33 @@
     ctx.fillRect(gate.right - 7, y, 6, 4);
     // Track attribute
     setAttr(gate.right, y, rightColorName, 'BRIGHT_WHITE');
+  }
+
+  // Draw authentic ZX Spectrum-style tree obstacle
+  function drawTree(obstacle, cameraY) {
+    const y = obstacle.y - cameraY;
+    if (y < -20 || y > LOGICAL_H + 20) return;
+
+    const x = obstacle.x;
+    const size = obstacle.r; // Use radius as size reference
+
+    // Green triangular canopy - drawn as stacked rectangles for blocky look
+    ctx.fillStyle = ZX_PALETTE.GREEN;
+    const canopyHeight = size * 1.5;
+    for (let row = 0; row < canopyHeight; row++) {
+      const width = Math.floor((canopyHeight - row) * 1.2);
+      ctx.fillRect(x - width / 2, y - canopyHeight + row, width, 1);
+    }
+
+    // Red trunk (ZX Spectrum had no brown)
+    ctx.fillStyle = ZX_PALETTE.RED;
+    const trunkW = Math.max(2, Math.floor(size * 0.3));
+    const trunkH = Math.floor(size * 0.5);
+    ctx.fillRect(x - trunkW / 2, y, trunkW, trunkH);
+
+    // Track in attribute system
+    setAttr(x, y - size, 'GREEN', 'BRIGHT_WHITE');
+    setAttr(x, y, 'RED', 'BRIGHT_WHITE');
   }
 
   function drawSki() {
