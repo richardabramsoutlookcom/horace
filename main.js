@@ -8,8 +8,9 @@
   const overlayEl = document.getElementById("overlay");
   const rotateEl = document.getElementById("rotate");
 
-  const LOGICAL_W = 360;
-  const LOGICAL_H = 640;
+  // ZX Spectrum native resolution
+  const LOGICAL_W = 256;
+  const LOGICAL_H = 192;
 
   const MODE = {
     ROAD: "ROAD",
@@ -46,14 +47,14 @@
   };
 
   const horace = {
-    x: LOGICAL_W / 2,
-    y: LOGICAL_H - 50,
+    x: LOGICAL_W / 2 - 9,
+    y: LOGICAL_H - 24,
     w: 18,
     h: 22,
     speed: 0,
-    maxSpeed: 180,
-    acceleration: 300,
-    deceleration: 250,
+    maxSpeed: 120,
+    acceleration: 200,
+    deceleration: 180,
   };
 
   let vehicles = [];
@@ -64,19 +65,22 @@
   let shopTimer = 0;
   let shopScored = false;
 
+  // Road layout for 256x192 display (proportional from original portrait)
   const roadLayout = {
-    top: 90,
-    bottom: 560,
-    lanes: 5,
+    top: 32,       // Top pavement/shop area
+    bottom: 168,   // Bottom pavement starts here
+    lanes: 4,      // 4 lanes for tighter spacing
   };
 
+  // Ski shop area at top of screen
   const shopRect = {
-    x: LOGICAL_W * 0.2,
-    y: 16,
-    w: LOGICAL_W * 0.6,
-    h: 58,
+    x: LOGICAL_W * 0.25,
+    y: 4,
+    w: LOGICAL_W * 0.5,
+    h: 24,
   };
 
+  // Bottom pavement where Horace starts
   const pavementRect = {
     x: 0,
     y: roadLayout.bottom,
@@ -141,8 +145,8 @@
   }
 
   function resetHoraceToRoad() {
-    horace.x = LOGICAL_W / 2;
-    horace.y = LOGICAL_H - 40;
+    horace.x = LOGICAL_W / 2 - 9;
+    horace.y = LOGICAL_H - 24;
     horace.speed = 0;
     shopTimer = 0;
     shopScored = false;
@@ -157,14 +161,15 @@
       const dir = i % 2 === 0 ? 1 : -1;
       const count = 2 + (i % 2);
       for (let v = 0; v < count; v += 1) {
-        const width = 38 + Math.random() * 30;
-        const speedBase = 60 + Math.random() * 50;
+        // Smaller vehicles for 256x192 display
+        const width = 24 + Math.random() * 16;
+        const speedBase = 40 + Math.random() * 30;
         const speed = dir * speedBase * (1 + state.loopCount * 0.08);
         vehicles.push({
           x: Math.random() * LOGICAL_W,
-          y: laneY - 10,
+          y: laneY - 7,
           w: width,
-          h: 20,
+          h: 14,
           speed,
         });
       }
@@ -175,12 +180,13 @@
   function resetSkiRun() {
     gates = [];
     obstacles = [];
-    slopeLength = 2200 + state.loopCount * 120;
-    const baseSpacing = Math.max(100, 180 - state.loopCount * 12);
-    const gap = Math.max(60, 100 - state.loopCount * 6);
-    let y = 200;
-    while (y < slopeLength - 200) {
-      const margin = 30;
+    // Proportional slope length for 256x192 display
+    slopeLength = 800 + state.loopCount * 60;
+    const baseSpacing = Math.max(50, 80 - state.loopCount * 6);
+    const gap = Math.max(40, 60 - state.loopCount * 4);
+    let y = 80;
+    while (y < slopeLength - 80) {
+      const margin = 20;
       const left = margin + Math.random() * (LOGICAL_W - gap - margin * 2);
       gates.push({
         left,
@@ -188,20 +194,20 @@
         y,
         passed: false,
       });
-      y += baseSpacing + Math.random() * 40;
+      y += baseSpacing + Math.random() * 20;
     }
 
-    const obstacleCount = Math.min(16, 5 + state.loopCount * 2);
+    const obstacleCount = Math.min(10, 3 + state.loopCount * 2);
     for (let i = 0; i < obstacleCount; i += 1) {
       obstacles.push({
-        x: 24 + Math.random() * (LOGICAL_W - 48),
-        y: 240 + Math.random() * (slopeLength - 480),
-        r: 12 + Math.random() * 8,
+        x: 16 + Math.random() * (LOGICAL_W - 32),
+        y: 100 + Math.random() * (slopeLength - 200),
+        r: 8 + Math.random() * 4,
       });
     }
 
-    horace.x = LOGICAL_W / 2;
-    horace.y = 40;
+    horace.x = LOGICAL_W / 2 - 9;
+    horace.y = 24;
     horace.speed = 0;
     cameraY = 0;
   }
@@ -269,8 +275,8 @@
         }
       }
 
-      // Left/right movement
-      const moveSpeed = 150;
+      // Left/right movement (proportional for 256 width)
+      const moveSpeed = 100;
       if (input.left) {
         horace.x -= moveSpeed * dt;
       }
@@ -345,14 +351,14 @@
         horace.speed = Math.max(horace.speed - horace.deceleration * dt, 0);
       }
 
-      // Auto-scroll down the slope with player speed affecting it
-      const baseSpeed = 110 + state.loopCount * 5;
+      // Auto-scroll down the slope (proportional for 192 height)
+      const baseSpeed = 60 + state.loopCount * 3;
       const direction = input.up ? -1 : (input.down ? 1 : 0);
-      const speedModifier = direction * horace.speed * 0.3;
+      const speedModifier = direction * horace.speed * 0.2;
       horace.y += (baseSpeed + speedModifier) * dt;
 
-      // Left/right steering
-      const steerSpeed = 200;
+      // Left/right steering (proportional for 256 width)
+      const steerSpeed = 120;
       if (input.left) {
         horace.x -= steerSpeed * dt;
       }
@@ -364,7 +370,7 @@
       horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
     } else if (controlMode === 'swipe') {
       // Swipe mode: Tap to accelerate down, swipe left/right to move
-      const baseSpeed = 110 + state.loopCount * 5;
+      const baseSpeed = 60 + state.loopCount * 3;
 
       if (isTouching) {
         // Accelerate when touching
@@ -448,22 +454,22 @@
     ctx.fillStyle = "#A0A0A0";
     ctx.fillRect(0, 0, LOGICAL_W, roadLayout.top);
 
-    // Ski shop building
+    // Ski shop building (proportional for 256x192)
     ctx.fillStyle = "#0000FF";
-    ctx.fillRect(shopRect.x, shopRect.y + 10, shopRect.w, shopRect.h - 20);
+    ctx.fillRect(shopRect.x, shopRect.y + 4, shopRect.w, shopRect.h - 8);
 
     // Shop roof
     ctx.fillStyle = "#FF0000";
     ctx.beginPath();
-    ctx.moveTo(shopRect.x - 10, shopRect.y + 10);
-    ctx.lineTo(shopRect.x + shopRect.w / 2, shopRect.y - 5);
-    ctx.lineTo(shopRect.x + shopRect.w + 10, shopRect.y + 10);
+    ctx.moveTo(shopRect.x - 6, shopRect.y + 4);
+    ctx.lineTo(shopRect.x + shopRect.w / 2, shopRect.y);
+    ctx.lineTo(shopRect.x + shopRect.w + 6, shopRect.y + 4);
     ctx.fill();
 
     // Shop sign
     ctx.fillStyle = "#FFFF00";
-    ctx.font = "bold 12px monospace";
-    ctx.fillText("SKIS", shopRect.x + shopRect.w / 2 - 20, shopRect.y + 40);
+    ctx.font = "bold 8px monospace";
+    ctx.fillText("SKIS", shopRect.x + shopRect.w / 2 - 12, shopRect.y + 16);
 
     // Road
     ctx.fillStyle = "#404040";
@@ -474,8 +480,8 @@
     const laneHeight = (roadLayout.bottom - roadLayout.top) / roadLayout.lanes;
     for (let i = 1; i < roadLayout.lanes; i += 1) {
       const y = roadLayout.top + laneHeight * i;
-      for (let x = 0; x < LOGICAL_W; x += 20) {
-        ctx.fillRect(x, y - 1, 10, 2);
+      for (let x = 0; x < LOGICAL_W; x += 12) {
+        ctx.fillRect(x, y - 1, 6, 2);
       }
     }
 
@@ -492,15 +498,15 @@
       ctx.fillStyle = mainColor;
       ctx.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h);
 
-      // Windows
+      // Windows (proportional for smaller cars)
       ctx.fillStyle = accentColor;
       ctx.fillRect(vehicle.x + vehicle.w * 0.2, vehicle.y + 2, vehicle.w * 0.3, vehicle.h - 4);
-      ctx.fillRect(vehicle.x + vehicle.w * 0.6, vehicle.y + 2, vehicle.w * 0.25, vehicle.h - 4);
+      ctx.fillRect(vehicle.x + vehicle.w * 0.55, vehicle.y + 2, vehicle.w * 0.25, vehicle.h - 4);
 
       // Wheels
       ctx.fillStyle = "#000000";
-      ctx.fillRect(vehicle.x + 4, vehicle.y + vehicle.h - 2, 6, 2);
-      ctx.fillRect(vehicle.x + vehicle.w - 10, vehicle.y + vehicle.h - 2, 6, 2);
+      ctx.fillRect(vehicle.x + 2, vehicle.y + vehicle.h - 2, 4, 2);
+      ctx.fillRect(vehicle.x + vehicle.w - 6, vehicle.y + vehicle.h - 2, 4, 2);
     });
   }
 
@@ -509,40 +515,40 @@
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
-    // Diagonal snow texture lines for movement effect
+    // Diagonal snow texture lines for movement effect (proportional for 192 height)
     ctx.strokeStyle = "#E0E0E0";
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 12; i += 1) {
-      const y = ((i * 100) - (cameraY * 0.5)) % LOGICAL_H;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 8; i += 1) {
+      const y = ((i * 40) - (cameraY * 0.5)) % LOGICAL_H;
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(LOGICAL_W, y + 30);
+      ctx.lineTo(LOGICAL_W, y + 16);
       ctx.stroke();
     }
 
-    // Draw slalom gates - bright retro colors
+    // Draw slalom gates - bright retro colors (proportional for 256x192)
     gates.forEach((gate) => {
       const y = gate.y - cameraY;
-      if (y < -40 || y > LOGICAL_H + 40) return;
+      if (y < -20 || y > LOGICAL_H + 20) return;
 
       const leftColor = gate.passed ? "#00FF00" : "#FF0000";
       const rightColor = gate.passed ? "#00FF00" : "#0000FF";
 
-      // Left pole
+      // Left pole (smaller for 192 height)
       ctx.fillStyle = leftColor;
-      ctx.fillRect(gate.left - 4, y, 8, 30);
-      ctx.fillRect(gate.left - 8, y, 16, 8);
+      ctx.fillRect(gate.left - 2, y, 4, 16);
+      ctx.fillRect(gate.left - 4, y, 8, 4);
 
       // Right pole
       ctx.fillStyle = rightColor;
-      ctx.fillRect(gate.right - 4, y, 8, 30);
-      ctx.fillRect(gate.right - 8, y, 16, 8);
+      ctx.fillRect(gate.right - 2, y, 4, 16);
+      ctx.fillRect(gate.right - 4, y, 8, 4);
     });
 
-    // Obstacles - trees/rocks
+    // Obstacles - trees/rocks (proportional)
     obstacles.forEach((obstacle) => {
       const y = obstacle.y - cameraY;
-      if (y < -30 || y > LOGICAL_H + 30) return;
+      if (y < -16 || y > LOGICAL_H + 16) return;
 
       // Draw as simple trees in Spectrum style
       ctx.fillStyle = "#00AA00";
@@ -553,9 +559,9 @@
       ctx.closePath();
       ctx.fill();
 
-      // Trunk
+      // Trunk (proportional)
       ctx.fillStyle = "#804000";
-      ctx.fillRect(obstacle.x - 3, y + obstacle.r, 6, obstacle.r * 0.5);
+      ctx.fillRect(obstacle.x - 2, y + obstacle.r, 4, obstacle.r * 0.4);
     });
   }
 
@@ -616,10 +622,14 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const dpr = window.devicePixelRatio || 1;
-    const scale = Math.min(window.innerWidth / LOGICAL_W, window.innerHeight / LOGICAL_H);
+    // Integer scaling for crisp pixels - no blur between pixels
+    const maxScale = Math.min(window.innerWidth / LOGICAL_W, window.innerHeight / LOGICAL_H);
+    const scale = Math.max(1, Math.floor(maxScale));
     const offsetX = (window.innerWidth - LOGICAL_W * scale) / 2;
     const offsetY = (window.innerHeight - LOGICAL_H * scale) / 2;
     ctx.setTransform(scale * dpr, 0, 0, scale * dpr, offsetX * dpr, offsetY * dpr);
+    // Disable image smoothing for crisp pixel art
+    ctx.imageSmoothingEnabled = false;
 
     if (state.mode === MODE.ROAD) {
       drawRoad();
@@ -667,9 +677,11 @@
 
 
   function updateOrientationHint() {
-    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+    // Game is now landscape (256x192), so we want landscape orientation
+    const isLandscape = window.matchMedia("(orientation: landscape)").matches;
     const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-    rotateEl.classList.toggle("visible", isTouch && !isPortrait);
+    // Show rotate hint on touch devices that are in portrait mode
+    rotateEl.classList.toggle("visible", isTouch && !isLandscape);
   }
 
   function setupResize() {
@@ -684,9 +696,9 @@
     const minSwipeDistance = 30;
 
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      // Horizontal swipe
+      // Horizontal swipe (proportional for 256 width)
       if (Math.abs(deltaX) > minSwipeDistance) {
-        const stepSize = 40;
+        const stepSize = 24;
         if (deltaX > 0) {
           // Swipe right
           horace.x += stepSize;
@@ -700,9 +712,9 @@
         horace.x = Math.max(0, Math.min(LOGICAL_W - horace.w, horace.x));
       }
     } else {
-      // Vertical swipe
+      // Vertical swipe (proportional for 192 height)
       if (Math.abs(deltaY) > minSwipeDistance) {
-        const stepSize = 30;
+        const stepSize = 16;
         if (deltaY < 0) {
           // Swipe up
           horace.y -= stepSize;
