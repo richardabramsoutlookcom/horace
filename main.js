@@ -165,6 +165,7 @@
   let isTouching = false;
 
   let audioContext = null;
+  let currentOscillator = null;
 
   const state = {
     lives: 3,
@@ -225,8 +226,20 @@
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
   }
 
+  function stopCurrentSound() {
+    if (currentOscillator) {
+      try {
+        currentOscillator.stop(audioContext.currentTime);
+      } catch (e) {
+        // Oscillator may have already stopped
+      }
+      currentOscillator = null;
+    }
+  }
+
   function playBeep(freq, duration, volume = 0.08) {
     if (!audioContext) return;
+    stopCurrentSound();
     const osc = audioContext.createOscillator();
     const gain = audioContext.createGain();
     osc.type = "square";
@@ -234,6 +247,12 @@
     gain.gain.value = volume;
     osc.connect(gain);
     gain.connect(audioContext.destination);
+    currentOscillator = osc;
+    osc.onended = () => {
+      if (currentOscillator === osc) {
+        currentOscillator = null;
+      }
+    };
     osc.start();
     osc.stop(audioContext.currentTime + duration);
   }
@@ -244,15 +263,22 @@
 
   function playCarHit() {
     if (!audioContext) return;
+    stopCurrentSound();
     const osc = audioContext.createOscillator();
     const gain = audioContext.createGain();
-    osc.type = "sawtooth";
+    osc.type = "square";
     osc.frequency.setValueAtTime(200, audioContext.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.3);
-    gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.12, audioContext.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
     osc.connect(gain);
     gain.connect(audioContext.destination);
+    currentOscillator = osc;
+    osc.onended = () => {
+      if (currentOscillator === osc) {
+        currentOscillator = null;
+      }
+    };
     osc.start();
     osc.stop(audioContext.currentTime + 0.3);
   }
@@ -262,9 +288,31 @@
   }
 
   function playSkiEquipped() {
-    playBeep(440, 0.1, 0.08);
-    setTimeout(() => playBeep(660, 0.1, 0.08), 100);
-    setTimeout(() => playBeep(880, 0.15, 0.08), 200);
+    // Play ascending notes sequentially using single oscillator with frequency changes
+    // ZX Spectrum beeper could only play one sound at a time
+    if (!audioContext) return;
+    stopCurrentSound();
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = "square";
+    gain.gain.value = 0.06;
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    currentOscillator = osc;
+
+    // Ascending notes: 440Hz -> 660Hz -> 880Hz
+    const now = audioContext.currentTime;
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.setValueAtTime(660, now + 0.1);
+    osc.frequency.setValueAtTime(880, now + 0.2);
+
+    osc.onended = () => {
+      if (currentOscillator === osc) {
+        currentOscillator = null;
+      }
+    };
+    osc.start();
+    osc.stop(now + 0.35);
   }
 
   function playModeChange() {
