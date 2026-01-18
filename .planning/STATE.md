@@ -12,26 +12,26 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 Phase: 2 of 5 (Authentic Sprites)
 Plan: 3 of 3 complete
 Status: Phase 2 complete
-Last activity: 2026-01-18 — Completed 02-03-PLAN.md (Ski Slope Sprites)
+Last activity: 2026-01-18 — Completed 02-01-PLAN.md (Horace Sprite)
 
-Progress: ████████░░ 80%
+Progress: ████████░░ 100% (Phase 2)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 6 min
-- Total execution time: 0.43 hours
+- Total execution time: 0.52 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 2 | 20 min | 10 min |
-| 2 | 2 | 4 min | 2 min |
+| 2 | 3 | 11 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: 8 min, 12 min, 2 min, 2 min
+- Last 5 plans: 8 min, 12 min, 2 min, 2 min, 5 min
 - Trend: Accelerating
 
 ## Accumulated Context
@@ -49,6 +49,9 @@ Recent decisions affecting current work:
 | 01-02 | Attribute tracking without strict enforcement | Foundation for sprite design awareness |
 | 01-02 | WHITE paper for SKI, BLACK for ROAD | Match visual backgrounds per mode |
 | 01-02 | Magenta debug grid | Visibility against all backgrounds |
+| 02-01 | 16x20 pixel sprite size | Fits within 2x3 attribute blocks |
+| 02-01 | Color indices for sprite data | 0=transparent, 1=body, 2=eyes, 3=pupils |
+| 02-01 | Dynamic body color substitution | BRIGHT_BLUE normal, BRIGHT_GREEN skiing |
 | 02-02 | Black windows for yellow cars | Visual contrast |
 | 02-02 | Yellow windows for red cars | Visual distinction |
 | 02-03 | Flags extend horizontally from poles | Makes gates more visible |
@@ -64,6 +67,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-18T13:55:13Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-01-18T13:57:54Z
+Stopped at: Completed 02-01-PLAN.md (Horace Sprite)
 Resume file: None
