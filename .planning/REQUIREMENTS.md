@@ -47,9 +47,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Presentation
 
-- [ ] **PRES-01**: Text uses ZX Spectrum ROM font (8x8 bitmap)
-- [ ] **PRES-02**: HUD displays score and money in authentic layout/position
-- [ ] **PRES-03**: Title screen matches original game presentation
+- [x] **PRES-01**: Text uses ZX Spectrum ROM font (8x8 bitmap)
+- [x] **PRES-02**: HUD displays score and money in authentic layout/position
+- [x] **PRES-03**: Title screen matches original game presentation
 
 ## v2 Requirements
 
@@ -114,9 +114,9 @@ Which phases cover which requirements. Updated by create-roadmap.
 | GAME-09 | Phase 4 | Complete |
 | GAME-10 | Phase 4 | Complete |
 | GAME-11 | Phase 4 | Complete |
-| PRES-01 | Phase 5 | Pending |
-| PRES-02 | Phase 5 | Pending |
-| PRES-03 | Phase 5 | Pending |
+| PRES-01 | Phase 5 | Complete |
+| PRES-02 | Phase 5 | Complete |
+| PRES-03 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 25 total
@@ -125,4 +125,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-18*
-*Last updated: 2026-01-18 after Phase 4 completion*
+*Last updated: 2026-01-18 after Phase 5 completion*
