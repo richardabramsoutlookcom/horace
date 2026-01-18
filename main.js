@@ -352,6 +352,45 @@
     osc.stop(now + 0.18);
   }
 
+  function playSkiJump() {
+    // Ski jump: "bizarre ascending sound" from original game
+    // Ascending frequency sweep like going up/lifting off
+    // Will be wired to ski jump mechanic in Phase 4
+    if (!audioContext) return;
+    stopCurrentSound();
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    osc.type = "square";
+    gain.gain.value = 0.08;
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    currentOscillator = osc;
+
+    // Ascending sweep: 200Hz -> 800Hz over 0.3s
+    const now = audioContext.currentTime;
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+
+    // Fade out at end
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+    osc.onended = () => {
+      if (currentOscillator === osc) {
+        currentOscillator = null;
+      }
+    };
+    osc.start();
+    osc.stop(now + 0.3);
+  }
+
+  // playTreeCrash uses same sound as playCarHit
+  // Original ZX Spectrum likely used same crash sound for all collisions
+  // Keeping as alias for semantic clarity in code
+  function playTreeCrash() {
+    playCarHit();
+  }
+
   function setMessage(text, duration = 1.2) {
     messageEl.textContent = text;
     state.messageTime = duration;
