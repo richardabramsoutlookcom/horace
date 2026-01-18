@@ -471,6 +471,7 @@
   }
 
   function loseLife(reason, playSound = true) {
+    state.money -= 10;  // GAME-02: Ambulance fee
     state.lives -= 1;
     if (playSound) {
       playCarHit();
@@ -512,47 +513,35 @@
 
     // Handle movement based on control mode
     if (controlMode === 'keyboard') {
-      // Keyboard: All 4 directions with acceleration
-      const isMoving = input.up || input.down || input.left || input.right;
-
-      if (input.up) {
-        horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
-      } else if (input.down) {
-        horace.speed = Math.min(horace.speed + horace.acceleration * dt, horace.maxSpeed);
-      } else {
-        horace.speed = Math.max(horace.speed - horace.deceleration * dt, 0);
-      }
-
-      if (isMoving && horace.speed > 0) {
+      // Keyboard: Discrete step-based movement (authentic ZX Spectrum feel)
+      stepCooldown -= dt;
+      if (stepCooldown <= 0) {
+        let moved = false;
         if (input.up) {
-          horace.y -= horace.speed * dt;
+          horace.y -= ROAD_STEP_SIZE;
+          moved = true;
         } else if (input.down) {
-          horace.y += horace.speed * dt;
+          horace.y += ROAD_STEP_SIZE;
+          moved = true;
         }
-
-        shopTimer = 0;
-
-        const now = performance.now();
-        if (now - lastMoveSound > 100) {
+        if (input.left) {
+          horace.x -= ROAD_STEP_SIZE;
+          moved = true;
+        }
+        if (input.right) {
+          horace.x += ROAD_STEP_SIZE;
+          moved = true;
+        }
+        if (moved) {
           playMove();
-          lastMoveSound = now;
+          shopTimer = 0;
+          stepCooldown = 0.12; // 8 steps per second when holding key
         }
-      }
-
-      // Left/right movement (proportional for 256 width)
-      const moveSpeed = 100;
-      if (input.left) {
-        horace.x -= moveSpeed * dt;
-      }
-      if (input.right) {
-        horace.x += moveSpeed * dt;
       }
     } else if (controlMode === 'swipe') {
       // Swipe: Step-based movement like Crossy Road
       // Movement handled by swipe gestures (implemented in bindInput)
-      if (horace.speed > 0) {
-        horace.speed = Math.max(horace.speed - horace.deceleration * 3 * dt, 0);
-      }
+      // No continuous movement - steps are immediate on swipe
     }
 
     if (isHoraceInShop()) {
