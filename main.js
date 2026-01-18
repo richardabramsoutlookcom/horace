@@ -12,6 +12,28 @@
   const LOGICAL_W = 256;
   const LOGICAL_H = 192;
 
+  // ZX Spectrum 15-color palette (8 colors x 2 brightness, minus duplicate black)
+  const ZX_PALETTE = {
+    // Normal brightness (BRIGHT 0)
+    BLACK:    '#000000',
+    BLUE:     '#0000CD',
+    RED:      '#CD0000',
+    MAGENTA:  '#CD00CD',
+    GREEN:    '#00CD00',
+    CYAN:     '#00CDCD',
+    YELLOW:   '#CDCD00',
+    WHITE:    '#CDCDCD',
+    // Bright colors (BRIGHT 1)
+    BRIGHT_BLACK:   '#000000',  // Same as BLACK
+    BRIGHT_BLUE:    '#0000FF',
+    BRIGHT_RED:     '#FF0000',
+    BRIGHT_MAGENTA: '#FF00FF',
+    BRIGHT_GREEN:   '#00FF00',
+    BRIGHT_CYAN:    '#00FFFF',
+    BRIGHT_YELLOW:  '#FFFF00',
+    BRIGHT_WHITE:   '#FFFFFF',
+  };
+
   const MODE = {
     ROAD: "ROAD",
     SKI: "SKI",
@@ -446,20 +468,20 @@
   }
 
   function drawRoad() {
-    // Background - black like original
-    ctx.fillStyle = "#000000";
+    // Background - black like original ZX Spectrum
+    ctx.fillStyle = ZX_PALETTE.BLACK;
     ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
-    // Top area with ski shop
-    ctx.fillStyle = "#A0A0A0";
+    // Top area with ski shop - cyan pavement
+    ctx.fillStyle = ZX_PALETTE.CYAN;
     ctx.fillRect(0, 0, LOGICAL_W, roadLayout.top);
 
     // Ski shop building (proportional for 256x192)
-    ctx.fillStyle = "#0000FF";
+    ctx.fillStyle = ZX_PALETTE.BLUE;
     ctx.fillRect(shopRect.x, shopRect.y + 4, shopRect.w, shopRect.h - 8);
 
     // Shop roof
-    ctx.fillStyle = "#FF0000";
+    ctx.fillStyle = ZX_PALETTE.RED;
     ctx.beginPath();
     ctx.moveTo(shopRect.x - 6, shopRect.y + 4);
     ctx.lineTo(shopRect.x + shopRect.w / 2, shopRect.y);
@@ -467,16 +489,16 @@
     ctx.fill();
 
     // Shop sign
-    ctx.fillStyle = "#FFFF00";
+    ctx.fillStyle = ZX_PALETTE.BRIGHT_YELLOW;
     ctx.font = "bold 8px monospace";
     ctx.fillText("SKIS", shopRect.x + shopRect.w / 2 - 12, shopRect.y + 16);
 
-    // Road
-    ctx.fillStyle = "#404040";
+    // Road - black surface (ZX Spectrum roads were black)
+    ctx.fillStyle = ZX_PALETTE.BLACK;
     ctx.fillRect(0, roadLayout.top, LOGICAL_W, roadLayout.bottom - roadLayout.top);
 
     // Lane markings - dashed white lines
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = ZX_PALETTE.WHITE;
     const laneHeight = (roadLayout.bottom - roadLayout.top) / roadLayout.lanes;
     for (let i = 1; i < roadLayout.lanes; i += 1) {
       const y = roadLayout.top + laneHeight * i;
@@ -485,14 +507,14 @@
       }
     }
 
-    // Bottom pavement
-    ctx.fillStyle = "#A0A0A0";
+    // Bottom pavement - cyan to match top
+    ctx.fillStyle = ZX_PALETTE.CYAN;
     ctx.fillRect(pavementRect.x, pavementRect.y, pavementRect.w, pavementRect.h);
 
-    // Vehicles - colorful blocky cars
+    // Vehicles - colorful blocky cars using ZX palette
     vehicles.forEach((vehicle) => {
-      const mainColor = vehicle.speed > 0 ? "#FFFF00" : "#FF0000";
-      const accentColor = vehicle.speed > 0 ? "#FF00FF" : "#00FFFF";
+      const mainColor = vehicle.speed > 0 ? ZX_PALETTE.BRIGHT_YELLOW : ZX_PALETTE.BRIGHT_RED;
+      const accentColor = vehicle.speed > 0 ? ZX_PALETTE.BRIGHT_MAGENTA : ZX_PALETTE.BRIGHT_CYAN;
 
       // Car body
       ctx.fillStyle = mainColor;
@@ -504,19 +526,19 @@
       ctx.fillRect(vehicle.x + vehicle.w * 0.55, vehicle.y + 2, vehicle.w * 0.25, vehicle.h - 4);
 
       // Wheels
-      ctx.fillStyle = "#000000";
+      ctx.fillStyle = ZX_PALETTE.BLACK;
       ctx.fillRect(vehicle.x + 2, vehicle.y + vehicle.h - 2, 4, 2);
       ctx.fillRect(vehicle.x + vehicle.w - 6, vehicle.y + vehicle.h - 2, 4, 2);
     });
   }
 
   function drawSki() {
-    // White snowy slope
-    ctx.fillStyle = "#FFFFFF";
+    // White snowy slope - bright white for ZX Spectrum
+    ctx.fillStyle = ZX_PALETTE.BRIGHT_WHITE;
     ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
 
-    // Diagonal snow texture lines for movement effect (proportional for 192 height)
-    ctx.strokeStyle = "#E0E0E0";
+    // Diagonal snow texture lines for movement effect (cyan for ZX Spectrum look)
+    ctx.strokeStyle = ZX_PALETTE.CYAN;
     ctx.lineWidth = 1;
     for (let i = 0; i < 8; i += 1) {
       const y = ((i * 40) - (cameraY * 0.5)) % LOGICAL_H;
@@ -526,13 +548,14 @@
       ctx.stroke();
     }
 
-    // Draw slalom gates - bright retro colors (proportional for 256x192)
+    // Draw slalom gates - authentic ZX Spectrum colors
     gates.forEach((gate) => {
       const y = gate.y - cameraY;
       if (y < -20 || y > LOGICAL_H + 20) return;
 
-      const leftColor = gate.passed ? "#00FF00" : "#FF0000";
-      const rightColor = gate.passed ? "#00FF00" : "#0000FF";
+      // Passed gates turn green, otherwise red/blue
+      const leftColor = gate.passed ? ZX_PALETTE.BRIGHT_GREEN : ZX_PALETTE.BRIGHT_RED;
+      const rightColor = gate.passed ? ZX_PALETTE.BRIGHT_GREEN : ZX_PALETTE.BRIGHT_BLUE;
 
       // Left pole (smaller for 192 height)
       ctx.fillStyle = leftColor;
@@ -545,13 +568,13 @@
       ctx.fillRect(gate.right - 4, y, 8, 4);
     });
 
-    // Obstacles - trees/rocks (proportional)
+    // Obstacles - trees in ZX Spectrum colors
     obstacles.forEach((obstacle) => {
       const y = obstacle.y - cameraY;
       if (y < -16 || y > LOGICAL_H + 16) return;
 
-      // Draw as simple trees in Spectrum style
-      ctx.fillStyle = "#00AA00";
+      // Draw as simple trees in Spectrum style - green canopy
+      ctx.fillStyle = ZX_PALETTE.GREEN;
       ctx.beginPath();
       ctx.moveTo(obstacle.x, y - obstacle.r);
       ctx.lineTo(obstacle.x - obstacle.r, y + obstacle.r);
@@ -559,8 +582,8 @@
       ctx.closePath();
       ctx.fill();
 
-      // Trunk (proportional)
-      ctx.fillStyle = "#804000";
+      // Trunk - red or yellow (ZX Spectrum didn't have brown)
+      ctx.fillStyle = ZX_PALETTE.RED;
       ctx.fillRect(obstacle.x - 2, y + obstacle.r, 4, obstacle.r * 0.4);
     });
   }
@@ -570,9 +593,9 @@
     const x = horace.x;
     const y = drawY;
 
-    // Draw Horace in original ZX Spectrum style
-    const bodyColor = state.skiEquipped ? "#00FF00" : "#0000FF"; // Blue normally, green with skis
-    const whiteColor = "#FFFFFF";
+    // Draw Horace in original ZX Spectrum style using palette colors
+    // Blue normally, bright green when skiing
+    const bodyColor = state.skiEquipped ? ZX_PALETTE.BRIGHT_GREEN : ZX_PALETTE.BRIGHT_BLUE;
 
     ctx.fillStyle = bodyColor;
 
@@ -581,8 +604,8 @@
     ctx.fillRect(x + 3, y + 2, 12, 4); // Head middle/wide part
     ctx.fillRect(x + 5, y + 6, 8, 2);  // Head bottom
 
-    // Eyes (white)
-    ctx.fillStyle = whiteColor;
+    // Eyes (bright white)
+    ctx.fillStyle = ZX_PALETTE.BRIGHT_WHITE;
     ctx.fillRect(x + 5, y + 3, 2, 2);  // Left eye
     ctx.fillRect(x + 11, y + 3, 2, 2); // Right eye
 
@@ -598,9 +621,9 @@
     ctx.fillRect(x + 5, y + 18, 3, 2); // Left foot
     ctx.fillRect(x + 10, y + 18, 3, 2);// Right foot
 
-    // If skiing, draw skis
+    // If skiing, draw skis (bright white)
     if (state.mode === MODE.SKI && state.skiEquipped) {
-      ctx.fillStyle = whiteColor;
+      ctx.fillStyle = ZX_PALETTE.BRIGHT_WHITE;
       // Longer skis
       ctx.fillRect(x + 3, y + 20, 2, 4);  // Left ski
       ctx.fillRect(x + 13, y + 20, 2, 4); // Right ski
