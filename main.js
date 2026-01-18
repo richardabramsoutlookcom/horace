@@ -204,6 +204,10 @@
   let shopTimer = 0;
   let shopScored = false;
 
+  // Jump state for ski mode
+  let isJumping = false;
+  let jumpTimer = 0;
+
   // Road layout for 256x192 display (proportional from original portrait)
   const roadLayout = {
     top: 32,       // Top pavement/shop area
@@ -613,6 +617,19 @@
   }
 
   function updateSki(dt) {
+    // Jump mechanic (space bar triggers action)
+    if (input.action && !isJumping) {
+      isJumping = true;
+      jumpTimer = 0.3;  // Jump duration
+      playSkiJump();
+    }
+    if (isJumping) {
+      jumpTimer -= FIXED_DT;
+      if (jumpTimer <= 0) {
+        isJumping = false;
+      }
+    }
+
     if (controlMode === 'keyboard') {
       // Keyboard: Forward/back controls with acceleration, left/right for steering
       if (input.up) {
@@ -667,19 +684,22 @@
           checkPointBonus();  // Check for 1000-point bonus
           playGatePass();
         } else {
-          // Gate miss: play warning sound (different from crash)
-          // NOTE: Original game may not have lost a life for gate miss
-          // (just score penalty) - defer gameplay fix to Phase 4
+          // GAME-05: Gate miss loses points, not life
+          gate.passed = true;  // Mark as passed to avoid repeat penalty
+          const penalty = 10;  // Point penalty for miss
+          state.score = Math.max(0, state.score - penalty);
           playGateMiss();
-          loseLife("Missed gate!", false); // false = skip crash sound, we played warning
-          return;
+          setMessage("Missed gate! -10");
+          // Continue skiing - don't lose life
         }
       }
     }
 
+    // Tree collision - skip if jumping (can jump over trees)
     for (const obstacle of obstacles) {
-      if (circleRectOverlap(obstacle, horace)) {
-        loseLife("Hit obstacle!");
+      if (!isJumping && circleRectOverlap(obstacle, horace)) {
+        playTreeCrash();
+        loseLife("Hit obstacle!", false);
         return;
       }
     }
@@ -689,7 +709,7 @@
       state.mode = MODE.ROAD;
       state.skiEquipped = false;
       state.hasReturnedWithSkis = false;
-      state.score += 150;
+      state.score += 100;  // GAME-07: Finish bonus is 100 (not 150)
       checkPointBonus();  // Check for 1000-point bonus
       playModeChange();
       resetRoad();
@@ -1109,6 +1129,7 @@
       if (event.key === "ArrowDown" || event.key === "s") input.down = true;
       if (event.key === "ArrowLeft" || event.key === "a") input.left = true;
       if (event.key === "ArrowRight" || event.key === "d") input.right = true;
+      if (event.key === " " || event.key === "Space") input.action = true;
     });
 
     window.addEventListener("keyup", (event) => {
@@ -1117,6 +1138,7 @@
       if (event.key === "ArrowDown" || event.key === "s") input.down = false;
       if (event.key === "ArrowLeft" || event.key === "a") input.left = false;
       if (event.key === "ArrowRight" || event.key === "d") input.right = false;
+      if (event.key === " " || event.key === "Space") input.action = false;
     });
 
     // Swipe controls
