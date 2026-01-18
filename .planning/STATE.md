@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-18)
 ## Current Position
 
 Phase: 4 of 5 (Gameplay & Timing)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In progress
-Last activity: 2026-01-18 — Completed 04-01-PLAN.md (Fixed Timestep & Discrete Movement)
+Last activity: 2026-01-18 — Completed 04-02-PLAN.md (Money System)
 
-Progress: ██████░░░░ 65%
+Progress: ███████░░░ 70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: 5 min
-- Total execution time: 0.68 hours
+- Total execution time: 0.71 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: ██████░░░░ 65%
 | 1 | 2 | 20 min | 10 min |
 | 2 | 3 | 11 min | 4 min |
 | 3 | 2 | 9 min | 5 min |
-| 4 | 1 | 2 min | 2 min |
+| 4 | 2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 5 min, 4 min, 5 min, 2 min
+- Last 5 plans: 5 min, 4 min, 5 min, 2 min, 2 min
 - Trend: Stable (fast execution)
 
 ## Accumulated Context
@@ -68,6 +68,9 @@ Recent decisions affecting current work:
 | 04-01 | ROAD_STEP_SIZE = 16px | One cell height for discrete, predictable movement |
 | 04-01 | stepCooldown = 0.12s | 8 steps per second when holding key |
 | 04-01 | Ski mode stays continuous | Downhill skiing should feel smooth, not steppy |
+| 04-02 | Ski rental blocked when money < $10 | Shows warning message instead of silent fail |
+| 04-02 | Ambulance fee always charged | Even negative money, matches original pressure |
+| 04-02 | Separate threshold tracking | lastBonusThreshold for accurate bonus detection |
 
 ### Pending Todos
 
@@ -79,6 +82,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-18T17:13:57Z
-Stopped at: Completed 04-01-PLAN.md (Fixed Timestep & Discrete Movement)
+Last session: 2026-01-18T17:14:38Z
+Stopped at: Completed 04-02-PLAN.md (Money System)
 Resume file: None
