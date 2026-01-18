@@ -545,14 +545,32 @@
     // Background - black like original ZX Spectrum
     ctx.fillStyle = ZX_PALETTE.BLACK;
     ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
+    // Track road area in attribute system
+    for (let y = roadLayout.top; y < roadLayout.bottom; y += 8) {
+      for (let x = 0; x < LOGICAL_W; x += 8) {
+        setAttr(x, y, null, 'BLACK');
+      }
+    }
 
     // Top area with ski shop - cyan pavement
     ctx.fillStyle = ZX_PALETTE.CYAN;
     ctx.fillRect(0, 0, LOGICAL_W, roadLayout.top);
+    // Track top pavement in attribute system
+    for (let y = 0; y < roadLayout.top; y += 8) {
+      for (let x = 0; x < LOGICAL_W; x += 8) {
+        setAttr(x, y, 'CYAN', 'CYAN');
+      }
+    }
 
     // Ski shop building (proportional for 256x192)
     ctx.fillStyle = ZX_PALETTE.BLUE;
     ctx.fillRect(shopRect.x, shopRect.y + 4, shopRect.w, shopRect.h - 8);
+    // Track shop in attribute system
+    for (let y = shopRect.y; y < shopRect.y + shopRect.h; y += 8) {
+      for (let x = shopRect.x; x < shopRect.x + shopRect.w; x += 8) {
+        setAttr(x, y, 'BLUE', 'CYAN');
+      }
+    }
 
     // Shop roof
     ctx.fillStyle = ZX_PALETTE.RED;
@@ -578,21 +596,36 @@
       const y = roadLayout.top + laneHeight * i;
       for (let x = 0; x < LOGICAL_W; x += 12) {
         ctx.fillRect(x, y - 1, 6, 2);
+        // Track lane markings (white ink on black paper)
+        setAttr(x, y, 'WHITE', 'BLACK');
       }
     }
 
     // Bottom pavement - cyan to match top
     ctx.fillStyle = ZX_PALETTE.CYAN;
     ctx.fillRect(pavementRect.x, pavementRect.y, pavementRect.w, pavementRect.h);
+    // Track bottom pavement in attribute system
+    for (let y = pavementRect.y; y < LOGICAL_H; y += 8) {
+      for (let x = 0; x < LOGICAL_W; x += 8) {
+        setAttr(x, y, 'CYAN', 'CYAN');
+      }
+    }
 
     // Vehicles - colorful blocky cars using ZX palette
     vehicles.forEach((vehicle) => {
-      const mainColor = vehicle.speed > 0 ? ZX_PALETTE.BRIGHT_YELLOW : ZX_PALETTE.BRIGHT_RED;
+      const mainColorName = vehicle.speed > 0 ? 'BRIGHT_YELLOW' : 'BRIGHT_RED';
+      const mainColor = ZX_PALETTE[mainColorName];
       const accentColor = vehicle.speed > 0 ? ZX_PALETTE.BRIGHT_MAGENTA : ZX_PALETTE.BRIGHT_CYAN;
 
       // Car body
       ctx.fillStyle = mainColor;
       ctx.fillRect(vehicle.x, vehicle.y, vehicle.w, vehicle.h);
+      // Track vehicle in attribute system
+      for (let vy = vehicle.y; vy < vehicle.y + vehicle.h; vy += 8) {
+        for (let vx = vehicle.x; vx < vehicle.x + vehicle.w; vx += 8) {
+          setAttr(vx, vy, mainColorName, 'BLACK');
+        }
+      }
 
       // Windows (proportional for smaller cars)
       ctx.fillStyle = accentColor;
@@ -610,6 +643,7 @@
     // White snowy slope - bright white for ZX Spectrum
     ctx.fillStyle = ZX_PALETTE.BRIGHT_WHITE;
     ctx.fillRect(0, 0, LOGICAL_W, LOGICAL_H);
+    // Attribute buffer already cleared with BRIGHT_WHITE paper in draw()
 
     // Diagonal snow texture lines for movement effect (cyan for ZX Spectrum look)
     ctx.strokeStyle = ZX_PALETTE.CYAN;
@@ -620,6 +654,10 @@
       ctx.moveTo(0, y);
       ctx.lineTo(LOGICAL_W, y + 16);
       ctx.stroke();
+      // Track snow lines in attribute system
+      for (let x = 0; x < LOGICAL_W; x += 8) {
+        setAttr(x, y, 'CYAN', 'BRIGHT_WHITE');
+      }
     }
 
     // Draw slalom gates - authentic ZX Spectrum colors
@@ -628,18 +666,24 @@
       if (y < -20 || y > LOGICAL_H + 20) return;
 
       // Passed gates turn green, otherwise red/blue
-      const leftColor = gate.passed ? ZX_PALETTE.BRIGHT_GREEN : ZX_PALETTE.BRIGHT_RED;
-      const rightColor = gate.passed ? ZX_PALETTE.BRIGHT_GREEN : ZX_PALETTE.BRIGHT_BLUE;
+      const leftColorName = gate.passed ? 'BRIGHT_GREEN' : 'BRIGHT_RED';
+      const rightColorName = gate.passed ? 'BRIGHT_GREEN' : 'BRIGHT_BLUE';
+      const leftColor = ZX_PALETTE[leftColorName];
+      const rightColor = ZX_PALETTE[rightColorName];
 
       // Left pole (smaller for 192 height)
       ctx.fillStyle = leftColor;
       ctx.fillRect(gate.left - 2, y, 4, 16);
       ctx.fillRect(gate.left - 4, y, 8, 4);
+      // Track left pole in attribute system
+      setAttr(gate.left, y, leftColorName, 'BRIGHT_WHITE');
 
       // Right pole
       ctx.fillStyle = rightColor;
       ctx.fillRect(gate.right - 2, y, 4, 16);
       ctx.fillRect(gate.right - 4, y, 8, 4);
+      // Track right pole in attribute system
+      setAttr(gate.right, y, rightColorName, 'BRIGHT_WHITE');
     });
 
     // Obstacles - trees in ZX Spectrum colors
@@ -655,6 +699,8 @@
       ctx.lineTo(obstacle.x + obstacle.r, y + obstacle.r);
       ctx.closePath();
       ctx.fill();
+      // Track tree canopy in attribute system
+      setAttr(obstacle.x, y, 'GREEN', 'BRIGHT_WHITE');
 
       // Trunk - red or yellow (ZX Spectrum didn't have brown)
       ctx.fillStyle = ZX_PALETTE.RED;
@@ -669,7 +715,16 @@
 
     // Draw Horace in original ZX Spectrum style using palette colors
     // Blue normally, bright green when skiing
-    const bodyColor = state.skiEquipped ? ZX_PALETTE.BRIGHT_GREEN : ZX_PALETTE.BRIGHT_BLUE;
+    const bodyColorName = state.skiEquipped ? 'BRIGHT_GREEN' : 'BRIGHT_BLUE';
+    const bodyColor = ZX_PALETTE[bodyColorName];
+    const paperColor = state.mode === MODE.SKI ? 'BRIGHT_WHITE' : 'BLACK';
+
+    // Track Horace in attribute system (spans multiple 8x8 blocks)
+    for (let hy = y; hy < y + horace.h; hy += 8) {
+      for (let hx = x; hx < x + horace.w; hx += 8) {
+        setAttr(hx, hy, bodyColorName, paperColor);
+      }
+    }
 
     ctx.fillStyle = bodyColor;
 
@@ -718,6 +773,9 @@
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Clear attribute buffer for new frame
+    clearAttrs(state.mode === MODE.SKI ? 'BRIGHT_WHITE' : 'BLACK');
+
     const dpr = window.devicePixelRatio || 1;
     // Integer scaling for crisp pixels - no blur between pixels
     const maxScale = Math.min(window.innerWidth / LOGICAL_W, window.innerHeight / LOGICAL_H);
@@ -735,6 +793,9 @@
     }
 
     drawHorace();
+
+    // Draw attribute grid overlay (debug visualization)
+    drawAttrGrid();
 
     if (state.messageTime > 0) {
       state.messageTime -= dt;
