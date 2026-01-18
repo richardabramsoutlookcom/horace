@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-18)
 
 **Core value:** Authentic ZX Spectrum experience — when someone plays this, it should feel like the original 1982 game.
-**Current focus:** Phase 4 — Gameplay & Timing
+**Current focus:** Phase 4 — Gameplay & Timing (Complete)
 
 ## Current Position
 
 Phase: 4 of 5 (Gameplay & Timing)
-Plan: 2 of 3 complete
-Status: In progress
-Last activity: 2026-01-18 — Completed 04-02-PLAN.md (Money System)
+Plan: 3 of 3 complete
+Status: Phase complete
+Last activity: 2026-01-18 — Completed 04-03-PLAN.md (Scoring & Collision Fix)
 
-Progress: ███████░░░ 70%
+Progress: ████████░░ 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 5 min
-- Total execution time: 0.71 hours
+- Total execution time: 0.73 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: ███████░░░ 70%
 | 1 | 2 | 20 min | 10 min |
 | 2 | 3 | 11 min | 4 min |
 | 3 | 2 | 9 min | 5 min |
-| 4 | 2 | 4 min | 2 min |
+| 4 | 3 | 5 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 4 min, 5 min, 2 min, 2 min
+- Last 5 plans: 4 min, 5 min, 2 min, 2 min, 1 min
 - Trend: Stable (fast execution)
 
 ## Accumulated Context
@@ -71,6 +71,10 @@ Recent decisions affecting current work:
 | 04-02 | Ski rental blocked when money < $10 | Shows warning message instead of silent fail |
 | 04-02 | Ambulance fee always charged | Even negative money, matches original pressure |
 | 04-02 | Separate threshold tracking | lastBonusThreshold for accurate bonus detection |
+| 04-03 | Gate miss = 10 point penalty only | Original game didn't lose life for missed gates |
+| 04-03 | 30/70 bounce/crash tree collision | Creates unpredictability matching original feel |
+| 04-03 | Jump duration 0.3s | Long enough to clear obstacles, short enough for timing |
+| 04-03 | Finish bonus 100 points | Matches authentic original game values |
 
 ### Pending Todos
 
@@ -82,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-18T17:14:38Z
-Stopped at: Completed 04-02-PLAN.md (Money System)
+Last session: 2026-01-18T17:17:09Z
+Stopped at: Completed 04-03-PLAN.md (Scoring & Collision Fix)
 Resume file: None
